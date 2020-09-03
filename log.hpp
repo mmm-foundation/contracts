@@ -1,9 +1,7 @@
 #include <eosiolib/multi_index.hpp>
 #include <eosiolib/contract.hpp>
 #include "hash64.hpp"
-#include <eosiolib/binary_extension.hpp>
-
-
+#include <eosiolib/binary_extension.hpp> 
 // #define isDebug = TRUE
 class [[eosio::contract]] log : public eosio::contract {
 
@@ -20,8 +18,8 @@ public:
     
     void apply(uint64_t receiver, uint64_t code, uint64_t action);
     
-    static constexpr eosio::name _self = "log.core"_n;
-    static constexpr eosio::name _curator = "curator.core"_n;
+    static constexpr eosio::name _self = "log"_n;
+    static constexpr eosio::name _curator = "curator"_n;
         
     #ifdef isDebug
         static const uint64_t _DATA_ORDER_EXPIRATION = 10; 
