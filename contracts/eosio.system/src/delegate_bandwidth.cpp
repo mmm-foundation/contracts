@@ -23,7 +23,7 @@ namespace eosiosystem {
    using std::pair;
 
    static constexpr uint32_t refund_delay_sec = 3*24*3600;
-   static constexpr int64_t  ram_gift_bytes = 1400;
+   static constexpr int64_t  ram_gift_bytes = 0;
 
    struct [[eosio::table, eosio::contract("eosio.system")]] user_resources {
       name          owner;
@@ -178,6 +178,9 @@ namespace eosiosystem {
 
       check( bytes > 0, "cannot sell negative byte" );
 
+      auto acc = _guests.find(account.value);
+      check(acc == _guests.end(), "Guest cannot sell ram");
+
       user_resources_table  userres( _self, account.value );
       auto res_itr = userres.find( account.value );
       check( res_itr != userres.end(), "no resource row" );
@@ -223,14 +226,6 @@ namespace eosiosystem {
          );
          channel_to_rex( ramfee_account, asset(fee, core_symbol() ));
       }
-   }
-
-   void validate_b1_vesting( int64_t stake ) {
-      const int64_t base_time = 1527811200; /// 2018-06-01
-      const int64_t max_claimable = 100'000'000'0000ll;
-      const int64_t claimable = int64_t(max_claimable * double(now()-base_time) / (10*seconds_per_year) );
-
-      check( max_claimable - claimable <= stake, "b1 can only claim their tokens over 10 years" );
    }
 
    void system_contract::changebw( name from, name receiver,
@@ -429,10 +424,6 @@ namespace eosiosystem {
 
       check( 0 <= voter_itr->staked, "stake for voting cannot be negative" );
 
-      if( voter == "b1"_n ) {
-         validate_b1_vesting( voter_itr->staked );
-      }
-
       if( voter_itr->producers.size() || voter_itr->proxy ) {
          update_votes( voter, voter_itr->proxy, voter_itr->producers, false );
       }
@@ -459,7 +450,7 @@ namespace eosiosystem {
       check( unstake_net_quantity >= zero_asset, "must unstake a positive amount" );
       check( unstake_cpu_quantity.amount + unstake_net_quantity.amount > 0, "must unstake a positive amount" );
       check( _gstate.total_activated_stake >= min_activated_stake,
-             "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)" );
+             "cannot undelegate bandwidth until the chain is activated" );
 
       changebw( from, receiver, -unstake_net_quantity, -unstake_cpu_quantity, false);
    } // undelegatebw

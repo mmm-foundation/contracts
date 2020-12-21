@@ -22,7 +22,8 @@ namespace eosiosystem {
     _rexpool(_self, _self.value),
     _rexfunds(_self, _self.value),
     _rexbalance(_self, _self.value),
-    _rexorders(_self, _self.value)
+    _rexorders(_self, _self.value),
+    _guests(_registrator, _registrator.value)
    {
       //print( "construct system\n" );
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();
@@ -315,12 +316,36 @@ namespace eosiosystem {
       print( name{bidder}, " bid ", bid, " on ", name{newname}, "\n" );
       auto current = bids.find( newname.value );
       if( current == bids.end() ) {
+
+        //Check min about by length
+         eosio::string name_string = newname.to_string();
+         uint64_t name_length = name_string.length();
+
+         if (_gstate.total_activated_stake < min_activated_stake){
+           if ((name_length == 10 ) || (name_length == 11 ))
+            check(bid.amount >= 20000, "2.0000 UNIT is minimum bid for current length");
+
+           if ((name_length == 8 ) || (name_length == 9 ))
+            check(bid.amount >= 30000, "3.0000 UNIT is minimum bid for current length");
+
+           if ((name_length == 6 ) || (name_length == 7 ))
+            check(bid.amount >= 100000, "10.0000 UNIT is minimum bid for current length");
+
+           if ((name_length >= 2 ) || (name_length <= 5 ))
+            check(bid.amount >= 1000000, "100.0000 UNIT is minimum bid for current length");
+
+           if (name_length == 1 )
+            check(false, "Accounts with current length is not on sale");
+        }
+
          bids.emplace( bidder, [&]( auto& b ) {
             b.newname = newname;
             b.high_bidder = bidder;
             b.high_bid = bid.amount;
             b.last_bid_time = current_time_point();
          });
+
+
       } else {
          check( current->high_bid > 0, "this auction has already closed" );
          check( bid.amount - current->high_bid > (current->high_bid / 10), "must increase bid by 10%" );
@@ -383,7 +408,7 @@ namespace eosiosystem {
                             ignore<authority> owner,
                             ignore<authority> active ) {
 
-      if( creator != _self ) {
+      if(( creator != _self ) && ( creator != _registrator )) {
          uint64_t tmp = newact.value >> 4;
          bool has_dot = false;
 
@@ -443,12 +468,13 @@ namespace eosiosystem {
       check( system_token_supply.symbol == core, "specified core symbol does not exist (precision mismatch)" );
 
       check( system_token_supply.amount > 0, "system token supply must be greater than 0" );
+      
       _rammarket.emplace( _self, [&]( auto& m ) {
          m.supply.amount = 100000000000000ll;
          m.supply.symbol = ramcore_symbol;
          m.base.balance.amount = int64_t(_gstate.free_ram());
          m.base.balance.symbol = ram_symbol;
-         m.quote.balance.amount = system_token_supply.amount / 1000;
+         m.quote.balance.amount = system_token_supply.amount / 100000;
          m.quote.balance.symbol = core;
       });
 

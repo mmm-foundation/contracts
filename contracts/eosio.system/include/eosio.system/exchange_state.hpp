@@ -18,7 +18,7 @@ namespace eosiosystem {
 
       struct connector {
          asset balance;
-         double weight = .5;
+         double weight = 1;//.5
 
          EOSLIB_SERIALIZE( connector, (balance)(weight) )
       };

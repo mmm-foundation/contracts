@@ -80,7 +80,7 @@ namespace eosiosystem {
    struct [[eosio::table("global"), eosio::contract("eosio.system")]] eosio_global_state : eosio::blockchain_parameters {
       uint64_t free_ram()const { return max_ram_size - total_ram_bytes_reserved; }
 
-      uint64_t             max_ram_size = 64ll*1024 * 1024 * 1024;
+      uint64_t             max_ram_size = 64ll* 1024 * 1024 * 1024;
       uint64_t             total_ram_bytes_reserved = 0;
       int64_t              total_ram_stake = 0;
 
@@ -209,6 +209,38 @@ namespace eosiosystem {
 
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
 
+
+
+   static constexpr eosio::name _registrator = "registrator"_n;
+
+
+  struct [[eosio::table, eosio::contract("eosio.system")]] guests {
+      eosio::name username;
+      
+      eosio::name registrator;
+      eosio::public_key public_key;
+      eosio::asset d_cpu;
+      eosio::asset d_net;
+
+      eosio::time_point_sec expiration;
+
+      eosio::asset to_pay;
+      
+      uint64_t primary_key() const {return username.value;}
+      uint64_t byexpr() const {return expiration.sec_since_epoch();}
+
+      EOSLIB_SERIALIZE(guests, (username)(registrator)(public_key)(d_cpu)(d_net)(expiration)(to_pay))
+  };
+
+    typedef eosio::multi_index<"guests"_n, guests,
+       eosio::indexed_by< "byexpr"_n, eosio::const_mem_fun<guests, uint64_t, 
+                      &guests::byexpr>>
+    > guests_inex;
+
+
+
+
+
    struct [[eosio::table,eosio::contract("eosio.system")]] rex_pool {
       uint8_t    version = 0;
       asset      total_lent; /// total amount of CORE_SYMBOL in open rex_loans
@@ -312,7 +344,8 @@ namespace eosiosystem {
          rex_fund_table          _rexfunds;
          rex_balance_table       _rexbalance;
          rex_order_table         _rexorders;
-
+         guests_inex             _guests;
+         
       public:
          static constexpr eosio::name active_permission{"active"_n};
          static constexpr eosio::name token_account{"eosio.token"_n};
@@ -682,6 +715,8 @@ namespace eosiosystem {
 
          // defined in voting.hpp
          void update_elected_producers( block_timestamp timestamp );
+
+         
          void update_votes( const name voter, const name proxy, const std::vector<name>& producers, bool voting );
          void propagate_weight_change( const voter_info& voter );
          double update_producer_votepay_share( const producers_table2::const_iterator& prod_itr,
