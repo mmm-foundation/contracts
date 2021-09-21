@@ -55,7 +55,7 @@ void token::issue( name to, asset quantity, string memo )
     }
 }
 
-void token::retire( asset quantity, string memo )
+void token::retire( name username, asset quantity, string memo )
 {
     auto sym = quantity.symbol;
     check( sym.is_valid(), "invalid symbol name" );
@@ -66,17 +66,18 @@ void token::retire( asset quantity, string memo )
     check( existing != statstable.end(), "token with symbol does not exist" );
     const auto& st = *existing;
 
-    require_auth( st.issuer );
+    require_auth( username );
     check( quantity.is_valid(), "invalid quantity" );
     check( quantity.amount > 0, "must retire positive quantity" );
 
     check( quantity.symbol == st.supply.symbol, "symbol precision mismatch" );
 
-    statstable.modify( st, same_payer, [&]( auto& s ) {
+    statstable.modify( st, username, [&]( auto& s ) {
        s.supply -= quantity;
     });
 
-    sub_balance( st.issuer, quantity );
+    sub_balance( username, quantity );
+
 }
 
 void token::transfer( name    from,
@@ -113,7 +114,27 @@ void token::sub_balance( name owner, asset value ) {
 
    from_acnts.modify( from, owner, [&]( auto& a ) {
          a.balance -= value;
+   });
+
+
+   globalbal_index from_acnts2( _self, _self.value );
+   auto by_user_and_symbol = from_acnts2.template get_index<"userandsym"_n>();
+   auto by_user_and_symbol_ids = combine_ids(owner.value, value.symbol.code().raw());
+
+   auto to2 = by_user_and_symbol.find(by_user_and_symbol_ids);
+
+   if( to2 == by_user_and_symbol.end() ) {
+      from_acnts2.emplace( owner, [&]( auto& a ) {
+        a.id = from_acnts2.available_primary_key();
+        a.username = owner;
+        a.balance = from.balance;
       });
+   } else {
+      by_user_and_symbol.modify( to2, same_payer, [&]( auto& a ) {
+        a.balance -= value;
+      });
+   }
+   
 }
 
 void token::add_balance( name owner, asset value, name ram_payer )
@@ -129,6 +150,30 @@ void token::add_balance( name owner, asset value, name ram_payer )
         a.balance += value;
       });
    }
+
+
+   globalbal_index to_acnts2( _self, _self.value );
+   auto by_user_and_symbol = to_acnts2.template get_index<"userandsym"_n>();
+   auto by_user_and_symbol_ids = combine_ids(owner.value, value.symbol.code().raw());
+
+   auto to2 = by_user_and_symbol.find(by_user_and_symbol_ids);
+
+   if( to2 == by_user_and_symbol.end() ) {
+      to_acnts2.emplace( ram_payer, [&]( auto& a ) {
+        a.id = to_acnts2.available_primary_key();
+        a.username = owner;
+        if( to == to_acnts.end() ) {
+          a.balance = value;
+        } else {
+          a.balance = to->balance; 
+        }
+      });
+   } else {
+      by_user_and_symbol.modify( to2, same_payer, [&]( auto& a ) {
+        a.balance += value;
+      });
+   }
+
 }
 
 void token::open( name owner, const symbol& symbol, name ram_payer )

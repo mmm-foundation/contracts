@@ -1,0 +1,42 @@
+Detecting C compiler ABI info failed to compile with the following output:
+Change Dir: /Users/darksun/dacom-code/UNIALL/contracts/eosio.contracts/build/contracts/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_bb673/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_bb673.dir/build.make CMakeFiles/cmTC_bb673.dir/build
+Building C object CMakeFiles/cmTC_bb673.dir/CMakeCCompilerABI.c.obj
+/usr/local/eosio.cdt/bin/eosio-cc   -O3     -v -o CMakeFiles/cmTC_bb673.dir/CMakeCCompilerABI.c.obj   -c /usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CMakeCCompilerABI.c
+clang version 7.0.0 (https://github.com/eosio/clang.git 3e38ccb3dacee8c53ed6d3d5a59d1f6d4f0c96cf) (https://github.com/eosio/llvm 798a37dc0de68ba4fd5bb2988e45f7d022b3bb65)
+Target: x86_64-apple-darwin18.5.0
+Thread model: posix
+InstalledDir: /usr/local/eosio.cdt/bin
+Linking C executable cmTC_bb673.wasm
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_bb673.dir/link.txt --verbose=1
+/usr/local/eosio.cdt/bin/eosio-ld  -v CMakeFiles/cmTC_bb673.dir/CMakeCCompilerABI.c.obj -o cmTC_bb673.wasm 
+eosio-ld: Unknown command line argument '-v'.  Try: '/usr/local/eosio.cdt/bin/eosio-ld -help'
+eosio-ld: Did you mean '-l'?
+make[4]: *** [cmTC_bb673.wasm] Error 1
+make[3]: *** [cmTC_bb673/fast] Error 2
+
+
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: /Users/darksun/dacom-code/UNIALL/contracts/eosio.contracts/build/contracts/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/make cmTC_0f52c/fast && /Applications/Xcode.app/Contents/Developer/usr/bin/make -f CMakeFiles/cmTC_0f52c.dir/build.make CMakeFiles/cmTC_0f52c.dir/build
+Building CXX object CMakeFiles/cmTC_0f52c.dir/CMakeCXXCompilerABI.cpp.obj
+/usr/local/eosio.cdt/bin/eosio-cpp    -O3     -v -o CMakeFiles/cmTC_0f52c.dir/CMakeCXXCompilerABI.cpp.obj -c /usr/local/Cellar/cmake/3.16.4/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+clang version 7.0.0 (https://github.com/eosio/clang.git 3e38ccb3dacee8c53ed6d3d5a59d1f6d4f0c96cf) (https://github.com/eosio/llvm 798a37dc0de68ba4fd5bb2988e45f7d022b3bb65)
+Target: x86_64-apple-darwin18.5.0
+Thread model: posix
+InstalledDir: /usr/local/eosio.cdt/bin
+Linking CXX executable cmTC_0f52c.wasm
+/usr/local/Cellar/cmake/3.16.4/bin/cmake -E cmake_link_script CMakeFiles/cmTC_0f52c.dir/link.txt --verbose=1
+/usr/local/eosio.cdt/bin/eosio-ld  -v CMakeFiles/cmTC_0f52c.dir/CMakeCXXCompilerABI.cpp.obj -o cmTC_0f52c.wasm 
+eosio-ld: Unknown command line argument '-v'.  Try: '/usr/local/eosio.cdt/bin/eosio-ld -help'
+eosio-ld: Did you mean '-l'?
+make[4]: *** [cmTC_0f52c.wasm] Error 1
+make[3]: *** [cmTC_0f52c/fast] Error 2
+
+
+
+

@@ -17,6 +17,10 @@ namespace eosio {
       public:
          using contract::contract;
 
+         static uint128_t combine_ids(const uint64_t &x, const uint64_t &y) {
+            return (uint128_t{x} << 64) | y;
+         };
+
          [[eosio::action]]
          void create( name   issuer,
                       asset  maximum_supply);
@@ -25,7 +29,7 @@ namespace eosio {
          void issue( name to, asset quantity, string memo );
 
          [[eosio::action]]
-         void retire( asset quantity, string memo );
+         void retire( name username, asset quantity, string memo );
 
          [[eosio::action]]
          void transfer( name    from,
@@ -66,6 +70,20 @@ namespace eosio {
             uint64_t primary_key()const { return balance.symbol.code().raw(); }
          };
 
+         struct [[eosio::table]] globalbal {
+            uint64_t id;
+            name username;
+            asset    balance;
+
+            uint64_t primary_key()const { return id; }
+            
+            uint128_t userandsym() const { return combine_ids(username.value, balance.symbol.code().raw()); }
+            uint128_t symandamount() const { return combine_ids(balance.symbol.code().raw(), - balance.amount);}
+        
+            // uint64_t primary_key()const { return balance.symbol.code().raw(); }
+         };
+
+
          struct [[eosio::table]] currency_stats {
             asset    supply;
             asset    max_supply;
@@ -75,7 +93,16 @@ namespace eosio {
          };
 
          typedef eosio::multi_index< "accounts"_n, account > accounts;
+
+
+         typedef eosio::multi_index<"globalbal"_n, globalbal,
+           eosio::indexed_by<"userandsym"_n, eosio::const_mem_fun<globalbal, uint128_t, &globalbal::userandsym>>,
+           eosio::indexed_by<"symandamount"_n, eosio::const_mem_fun<globalbal, uint128_t, &globalbal::symandamount>>
+          > globalbal_index;
+          
+
          typedef eosio::multi_index< "stat"_n, currency_stats > stats;
+
 
          void sub_balance( name owner, asset value );
          void add_balance( name owner, asset value, name ram_payer );

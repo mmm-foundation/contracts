@@ -54,6 +54,43 @@ namespace eosiosystem {
          return ( flags & ~static_cast<F>(field) );
    }
 
+   
+   uint128_t combine_ids(const uint64_t &x, const uint64_t &y) {
+   
+      return (uint128_t{x} << 64) | y;
+   
+   };
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] emission {
+     uint64_t        id;
+     block_timestamp last_emission_at;
+     
+
+     uint64_t primary_key()const { return id;}   
+   };
+
+   typedef eosio::multi_index< "emission"_n, emission> emission_index;
+
+
+   struct [[eosio::table, eosio::contract("eosio.system")]] funds {
+     uint64_t        id;
+     name            contract;
+     asset           quantity; 
+     
+
+     uint64_t primary_key()const { return id;}
+     uint128_t codeandsmbl() const {return combine_ids(contract.value, quantity.symbol.code().raw());}
+        
+   };
+
+
+   typedef eosio::multi_index< "funds"_n, funds,
+     indexed_by<"codeandsmbl"_n, const_mem_fun<funds, uint128_t, &funds::codeandsmbl>  >
+   > funds_index;
+
+
+   
+
    struct [[eosio::table, eosio::contract("eosio.system")]] name_bid {
      name            newname;
      name            high_bidder;
@@ -358,9 +395,15 @@ namespace eosiosystem {
          static constexpr eosio::name saving_account{"eosio.saving"_n};
          static constexpr eosio::name rex_account{"eosio.rex"_n};
          static constexpr eosio::name null_account{"eosio.null"_n};
+
+         static constexpr eosio::name p2p_account{"p2p"_n}; //p2p
+         static constexpr eosio::name core_account{"unicore"_n}; //core.y
+         static constexpr eosio::name core_host{"community"_n}; //core
+
          static constexpr symbol ramcore_symbol = symbol(symbol_code("RAMCORE"), 4);
          static constexpr symbol ram_symbol     = symbol(symbol_code("RAM"), 0);
          static constexpr symbol rex_symbol     = symbol(symbol_code("REX"), 4);
+
 
          system_contract( name s, name code, datastream<const char*> ds );
          ~system_contract();
@@ -373,9 +416,19 @@ namespace eosiosystem {
 
          // Actions:
          [[eosio::action]]
-         void init( unsigned_int version, symbol core );
+         void init( unsigned_int version, symbol core, int64_t init_market_amount );
+         
          [[eosio::action]]
          void onblock( ignore<block_header> header );
+
+         [[eosio::action]]
+         void activate( time_point_sec activate_at);
+
+         [[eosio::action]]
+         void compensate( asset compensate_asset);
+
+         [[eosio::action]]
+         void inprodincome( name contract, asset income);
 
          [[eosio::action]]
          void setalimits( name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight );
@@ -579,7 +632,8 @@ namespace eosiosystem {
          void unregprod( const name producer );
 
          [[eosio::action]]
-         void setram( uint64_t max_ram_size );
+         void setram( uint64_t max_ram_size, double devider );
+         
          [[eosio::action]]
          void setramrate( uint16_t bytes_per_block );
 

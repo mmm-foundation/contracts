@@ -30,7 +30,9 @@ namespace eosiosystem {
    void system_contract::regproducer( const name producer, const eosio::public_key& producer_key, const std::string& url, uint16_t location ) {
       check( url.size() < 512, "url too long" );
       check( producer_key != eosio::public_key(), "public key should not be the default value" );
+      
       require_auth( producer );
+      // require_auth("eosio"_n);
 
       auto prod = _producers.find( producer.value );
       const auto ct = current_time_point();
