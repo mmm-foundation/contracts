@@ -52,7 +52,7 @@ using namespace eosio;
         // eosio::check(parent_comment != parent_comments.end(), "Parent comment is not found");
     
         if (owner.value != author.value){
-          eosio::check(parent_comment -> comments_is_enabled == true, "Comments is disabled");
+          // eosio::check(parent_comment -> comments_is_enabled == true, "Comments is disabled");
 
         }
 
