@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.3" xml:lang="en-US">
+  <compounddef id="indexpage" kind="page">
+    <compoundname>index</compoundname>
+    <title>LOG</title>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><anchor id="index_1md_README"/><heading level="2">Стек: C/C++, eosio.cdt 1.5.0</heading>
+</para>
+<para><heading level="1">Введение</heading>
+</para>
+<para>Контракт используется для создания постов и комментариев к ним неограниченной вложенности. Работает в связке с модулем DEMUX, получающим посты из блокчейна и модулем GRAPHQL для выдачи их веб-терминалу по API. На текущий момент хранит посты в оперативной памяти, что не является обязательным.</para>
+<para><heading level="1">Компиляция</heading>
+</para>
+<para>Заменить ABSOLUTE_PATH_TO_CONTRACT на абсолютный путь к директории контракта log. <programlisting><codeline><highlight class="normal">docker<sp/>run<sp/>--rm<sp/>--name<sp/>eosio.cdt_v1.5.0<sp/>--volume<sp/>/ABSOLUTE_PATH_TO_CONTRACT:/project<sp/>-w<sp/>/project<sp/>eostudio/eosio.cdt:v1.5.0<sp/>/bin/bash<sp/>-c<sp/>&quot;eosio-cpp<sp/>-abigen<sp/>-I<sp/>include<sp/>-R<sp/>include<sp/>-contract<sp/>log<sp/>-o<sp/>log.wasm<sp/>log.cpp&quot;<sp/>&amp;</highlight></codeline>
+</programlisting></para>
+<para><heading level="1">Генерация документации</heading>
+</para>
+<para>Требуется Doxygen версии от 1.9.3 <programlisting><codeline><highlight class="normal">git<sp/>submodule<sp/>update<sp/>--init<sp/>--recursive</highlight></codeline>
+<codeline><highlight class="normal">doxygen</highlight></codeline>
+</programlisting></para>
+<para><heading level="1">Установка</heading>
+</para>
+<para><programlisting><codeline><highlight class="normal">cleos<sp/>set<sp/>contract<sp/>log<sp/>ABSOLUTE_PATH_TO_CONTRACT<sp/>-p<sp/>log</highlight></codeline>
+</programlisting></para>
+<para><heading level="1">Действующие аккаунты</heading>
+</para>
+<para><itemizedlist>
+<listitem><para>me - собственное имя контракта;</para>
+</listitem></itemizedlist>
+</para>
+<para><heading level="1">Основные управляющие параметры</heading>
+</para>
+<para><itemizedlist>
+<listitem><para>MIN_PERMLINK_LENGTH - минимальное количество символов в прямой ссылке</para>
+</listitem><listitem><para>MAX_PERMLINK_LENGTH - максимальное количество символов в прямой ссылке</para>
+</listitem></itemizedlist>
+</para>
+<para><heading level="1">Роли</heading>
+</para>
+<para><itemizedlist>
+<listitem><para>Автор - создаёт и удаляет пост</para>
+</listitem></itemizedlist>
+</para>
+<para><heading level="1">Сценарии</heading>
+</para>
+<para><heading level="3">Создать пост</heading>
+</para>
+<para>Для создания поста, необходимо вызвать метод post: <programlisting><codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>post<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink&quot;,<sp/>&quot;&quot;,<sp/>&quot;&quot;,<sp/>&quot;title&quot;,<sp/>&quot;body&quot;,<sp/>&quot;&quot;,<sp/>true,<sp/>0,<sp/>false,<sp/>&quot;&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+</programlisting></para>
+<para>Для создания ответа на этот пост, необходимо вызвать метод post с указанием параметров поста-родителя: <programlisting><codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>post<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink2&quot;,<sp/>&quot;permlink&quot;,<sp/>&quot;tester&quot;,<sp/>&quot;title&quot;,<sp/>&quot;body&quot;,<sp/>&quot;&quot;,<sp/>true,<sp/>0,<sp/>false,<sp/>&quot;&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+</programlisting></para>
+<para><heading level="3">Удалить пост</heading>
+</para>
+<para>Для удаления поста необходимо вызвать метод del: <programlisting><codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>del<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+</programlisting></para>
+<para><heading level="3">Документация к методам и таблицам контракта</heading>
+</para>
+<para>Документация к методам и таблицам контракта доступна в папке docs/html/index.html</para>
+<para><heading level="1">TODO</heading>
+</para>
+    </detaileddescription>
+    <location file="README.md"/>
+  </compounddef>
+</doxygen>
