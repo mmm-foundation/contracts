@@ -43,9 +43,6 @@ namespace eosio {
          [[eosio::action]]
          void close( name owner, const symbol& symbol );
 
-         [[eosio::action]]
-         void issueall(name owner, const symbol& symbol, eosio::asset amount);
-
          static asset get_supply( name token_contract_account, symbol_code sym_code )
          {
             stats statstable( token_contract_account, sym_code.raw() );

@@ -28,6 +28,24 @@
             ]
         },
         {
+            "name": "addben",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "benefactor",
+                    "type": "name"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "authority",
             "base": "",
             "fields": [
@@ -46,6 +64,158 @@
                 {
                     "name": "waits",
                     "type": "wait_weight[]"
+                }
+            ]
+        },
+        {
+            "name": "balance4",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "chost",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "name"
+                },
+                {
+                    "name": "cycle_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pool_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "global_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "quants_for_sale",
+                    "type": "uint64"
+                },
+                {
+                    "name": "next_quants_for_sale",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_recalculated_win_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "win",
+                    "type": "bool"
+                },
+                {
+                    "name": "root_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "convert_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "pool_color",
+                    "type": "string"
+                },
+                {
+                    "name": "available",
+                    "type": "asset"
+                },
+                {
+                    "name": "purchase_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "compensator_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "start_convert_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "if_convert",
+                    "type": "asset"
+                },
+                {
+                    "name": "if_convert_to_power",
+                    "type": "asset"
+                },
+                {
+                    "name": "solded_for",
+                    "type": "asset"
+                },
+                {
+                    "name": "withdrawed",
+                    "type": "bool"
+                },
+                {
+                    "name": "forecasts",
+                    "type": "asset[]"
+                },
+                {
+                    "name": "ref_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "dac_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "cfund_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "hfund_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "sys_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "meta",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "benefactors",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "benefactor",
+                    "type": "name"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                },
+                {
+                    "name": "installed_at",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -272,6 +442,11 @@
             ]
         },
         {
+            "name": "checkstatus",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "claimrewards",
             "base": "",
             "fields": [
@@ -336,6 +511,62 @@
             ]
         },
         {
+            "name": "corepartners",
+            "base": "",
+            "fields": [
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "name"
+                },
+                {
+                    "name": "total_good",
+                    "type": "asset"
+                },
+                {
+                    "name": "sediment",
+                    "type": "asset"
+                },
+                {
+                    "name": "join_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "expiration",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "cycle",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "ahost",
+                    "type": "name"
+                },
+                {
+                    "name": "start_at_global_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "finish_at_global_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "emitted",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
             "name": "defcpuloan",
             "base": "",
             "fields": [
@@ -368,6 +599,20 @@
                 {
                     "name": "amount",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "delben",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "benefactor",
+                    "type": "name"
                 }
             ]
         },
@@ -458,6 +703,56 @@
                 {
                     "name": "last_emission_at",
                     "type": "block_timestamp_type"
+                }
+            ]
+        },
+        {
+            "name": "eosio_commitee",
+            "base": "",
+            "fields": [
+                {
+                    "name": "new_tokens_per_block",
+                    "type": "int64"
+                },
+                {
+                    "name": "to_producers_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "to_saving_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "per_block_pay_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "per_vote_pay_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_enabled",
+                    "type": "bool"
+                },
+                {
+                    "name": "new_tokens_for_spraying",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_period_in_blocks",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_rotation_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_core_funds_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "core_host",
+                    "type": "name"
                 }
             ]
         },
@@ -628,6 +923,172 @@
                 {
                     "name": "quantity",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "goals",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "parent_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "type",
+                    "type": "name"
+                },
+                {
+                    "name": "creator",
+                    "type": "name"
+                },
+                {
+                    "name": "benefactor",
+                    "type": "name"
+                },
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "name"
+                },
+                {
+                    "name": "who_can_create_tasks",
+                    "type": "name"
+                },
+                {
+                    "name": "benefactors_weight",
+                    "type": "uint64"
+                },
+                {
+                    "name": "duration",
+                    "type": "uint64"
+                },
+                {
+                    "name": "priority",
+                    "type": "uint64"
+                },
+                {
+                    "name": "title",
+                    "type": "string"
+                },
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "target",
+                    "type": "asset"
+                },
+                {
+                    "name": "target1",
+                    "type": "asset"
+                },
+                {
+                    "name": "target2",
+                    "type": "asset"
+                },
+                {
+                    "name": "available",
+                    "type": "asset"
+                },
+                {
+                    "name": "withdrawed",
+                    "type": "asset"
+                },
+                {
+                    "name": "debt_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "debt_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "positive_votes",
+                    "type": "uint64"
+                },
+                {
+                    "name": "negative_votes",
+                    "type": "uint64"
+                },
+                {
+                    "name": "filled_votes",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_tasks",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_reports",
+                    "type": "uint64"
+                },
+                {
+                    "name": "approved_reports",
+                    "type": "uint64"
+                },
+                {
+                    "name": "is_encrypted",
+                    "type": "bool"
+                },
+                {
+                    "name": "public_key",
+                    "type": "string"
+                },
+                {
+                    "name": "created",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "start_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "finish_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "expired_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "voters",
+                    "type": "name[]"
+                },
+                {
+                    "name": "report",
+                    "type": "string"
+                },
+                {
+                    "name": "meta",
+                    "type": "string"
+                },
+                {
+                    "name": "second_circuit_votes",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_asset_on_distribution",
+                    "type": "asset"
+                },
+                {
+                    "name": "remain_asset_on_distribution",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_power_on_distribution",
+                    "type": "uint64"
+                },
+                {
+                    "name": "remain_power_on_distribution",
+                    "type": "uint64"
                 }
             ]
         },
@@ -830,6 +1291,48 @@
             ]
         },
         {
+            "name": "onupdate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "current_cycle_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "current_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "current_balance_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "update_balances_is_finish",
+                    "type": "bool"
+                },
+                {
+                    "name": "convert_to_goals_is_finish",
+                    "type": "bool"
+                },
+                {
+                    "name": "convert_from_goals_is_finish",
+                    "type": "bool"
+                },
+                {
+                    "name": "pool_expired_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "window_expired_at",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "pair_time_point_sec_int64",
             "base": "",
             "fields": [
@@ -952,6 +1455,54 @@
                 {
                     "name": "producers",
                     "type": "producer_key[]"
+                }
+            ]
+        },
+        {
+            "name": "pushupdate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "current_cycle_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "current_pool_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "pool_expired_at",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "window_expired_at",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "putreserve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
                 }
             ]
         },
@@ -1378,6 +1929,56 @@
             ]
         },
         {
+            "name": "seteparams",
+            "base": "",
+            "fields": [
+                {
+                    "name": "new_tokens_per_block",
+                    "type": "int64"
+                },
+                {
+                    "name": "to_producers_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "to_saving_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "per_block_pay_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "per_vote_pay_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_enabled",
+                    "type": "bool"
+                },
+                {
+                    "name": "new_tokens_for_spraying",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_period_in_blocks",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_rotation_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "spraying_core_funds_percent",
+                    "type": "int64"
+                },
+                {
+                    "name": "core_host",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "setparams",
             "base": "",
             "fields": [
@@ -1432,6 +2033,28 @@
                 {
                     "name": "balance",
                     "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "takereserve",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "token_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
                 }
             ]
         },
@@ -1506,6 +2129,11 @@
                     "type": "asset"
                 }
             ]
+        },
+        {
+            "name": "update",
+            "base": "",
+            "fields": []
         },
         {
             "name": "updateauth",
@@ -1671,6 +2299,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "addben",
+            "type": "addben",
+            "ricardian_contract": ""
+        },
+        {
             "name": "bidname",
             "type": "bidname",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Bid On a Premium Account Name\nsummary: '{{nowrap bidder}} bids on the premium account name {{nowrap newname}}'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/account.png#3d55a2fc3a5c20b456f5657faf666bc25ffd06f4836c5e8256f741149b0b294f\n---\n\n{{bidder}} bids {{bid}} on an auction to own the premium account name {{newname}}.\n\n{{bidder}} transfers {{bid}} to the system to cover the cost of the bid, which will be returned to {{bidder}} only if {{bidder}} is later outbid in the auction for {{newname}} by another account.\n\nIf the auction for {{newname}} closes with {{bidder}} remaining as the highest bidder, {{bidder}} will be authorized to create the account with name {{newname}}.\n\n## Bid refund behavior\n\nIf {{bidder}}’s bid on {{newname}} is later outbid by another account, {{bidder}} will be able to claim back the transferred amount of {{bid}}. The system will attempt to automatically do this on behalf of {{bidder}}, but the automatic refund may occasionally fail which will then require {{bidder}} to manually claim the refund with the bidrefund action.\n\n## Auction close criteria\n\nThe system should automatically close the auction for {{newname}} if it satisfies the condition that over a period of two minutes the following two properties continuously hold:\n\n- no one has bid on {{newname}} within the last 24 hours;\n- and, the value of the latest bid on {{newname}} is greater than the value of the bids on each of the other open auctions.\n\nBe aware that the condition to close the auction described above are sufficient but not necessary. The auction for {{newname}} cannot close unless both of the properties are simultaneously satisfied, but it may be closed without requiring the properties to hold for a period of 2 minutes."
@@ -1699,6 +2332,11 @@
             "name": "canceldelay",
             "type": "canceldelay",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Cancel Delayed Transaction\nsummary: '{{nowrap canceling_auth.actor}} cancels a delayed transaction'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/account.png#3d55a2fc3a5c20b456f5657faf666bc25ffd06f4836c5e8256f741149b0b294f\n---\n\n{{canceling_auth.actor}} cancels the delayed transaction with id {{trx_id}}."
+        },
+        {
+            "name": "checkstatus",
+            "type": "checkstatus",
+            "ricardian_contract": ""
         },
         {
             "name": "claimrewards",
@@ -1734,6 +2372,11 @@
             "name": "defnetloan",
             "type": "defnetloan",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Withdraw from the Fund of a Specific NET Loan\nsummary: '{{nowrap from}} transfers {{nowrap amount}} from the fund of NET loan number {{nowrap loan_num}} back to REX fund'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/rex.png#d229837fa62a464b9c71e06060aa86179adf0b3f4e3b8c4f9702f4f4b0c340a8\n---\n\n{{from}} transfers {{amount}} from the fund of NET loan number {{loan_num}} back to REX fund."
+        },
+        {
+            "name": "delben",
+            "type": "delben",
+            "ricardian_contract": ""
         },
         {
             "name": "delegatebw",
@@ -1798,6 +2441,16 @@
         {
             "name": "onerror",
             "type": "onerror",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pushupdate",
+            "type": "pushupdate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "putreserve",
+            "type": "putreserve",
             "ricardian_contract": ""
         },
         {
@@ -1876,6 +2529,11 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Deploy Contract Code\nsummary: 'Deploy contract code on account {{nowrap account}}'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/account.png#3d55a2fc3a5c20b456f5657faf666bc25ffd06f4836c5e8256f741149b0b294f\n---\n\nDeploy compiled contract code to the account {{account}}."
         },
         {
+            "name": "seteparams",
+            "type": "seteparams",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setparams",
             "type": "setparams",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Set System Parameters\nsummary: 'Set System Parameters'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} sets system parameters to:\n{{to_json params}}"
@@ -1901,6 +2559,11 @@
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Adjust REX Pool Virtual Balance\nsummary: 'Adjust REX Pool Virtual Balance'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} adjusts REX loan rate by setting REX pool virtual balance to {{balance}}. No token transfer or issue is executed in this action."
         },
         {
+            "name": "takereserve",
+            "type": "takereserve",
+            "ricardian_contract": ""
+        },
+        {
             "name": "undelegatebw",
             "type": "undelegatebw",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Unstake Tokens for NET and/or CPU\nsummary: 'Unstake tokens for NET and/or CPU from {{nowrap receiver}}'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/resource.png#3830f1ce8cb07f7757dbcf383b1ec1b11914ac34a1f9d8b065f07600fa9dac19\n---\n\n{{from}} unstakes from {{receiver}} {{unstake_net_quantity}} for NET bandwidth and {{unstake_cpu_quantity}} for CPU bandwidth.\n\nThe sum of these two quantities will be removed from the vote weight of {{receiver}} and will be made available to {{from}} after an uninterrupted 3 day period without further unstaking by {{from}}. After the uninterrupted 3 day period passes, the system will attempt to automatically return the funds to {{from}}’s regular token balance. However, this automatic refund may occasionally fail which will then require {{from}} to manually claim the funds with the refund action."
@@ -1919,6 +2582,11 @@
             "name": "unstaketorex",
             "type": "unstaketorex",
             "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Buy REX Tokens Using Staked Tokens\nsummary: '{{nowrap owner}} buys REX tokens in exchange for tokens currently staked to NET and/or CPU'\nicon: http://127.0.0.1/ricardian_assets/eosio.contracts/icons/rex.png#d229837fa62a464b9c71e06060aa86179adf0b3f4e3b8c4f9702f4f4b0c340a8\n---\n\n{{from_net}} and {{from_cpu}} are withdrawn from {{receiver}}’s NET and CPU bandwidths respectively. These funds are used to purchase REX tokens at the current market exchange rate. In order for the action to succeed, {{owner}} must have voted for a proxy or at least 21 block producers.\n\nA sell order of the purchased amount can only be initiated after waiting for the maturity period of 4 to 5 days to pass. Even then, depending on the market conditions, the initiated sell order may not be executed immediately."
+        },
+        {
+            "name": "update",
+            "type": "update",
+            "ricardian_contract": ""
         },
         {
             "name": "updateauth",
@@ -1955,6 +2623,20 @@
             "key_types": []
         },
         {
+            "name": "balance4",
+            "type": "balance4",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "benefactors",
+            "type": "benefactors",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "bidrefunds",
             "type": "bid_refund",
             "index_type": "i64",
@@ -1962,8 +2644,29 @@
             "key_types": []
         },
         {
+            "name": "commitee",
+            "type": "eosio_commitee",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "corepartners",
+            "type": "corepartners",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "cpuloan",
             "type": "rex_loan",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "cycle",
+            "type": "cycle",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -2011,6 +2714,13 @@
             "key_types": []
         },
         {
+            "name": "goals",
+            "type": "goals",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "guests",
             "type": "guests",
             "index_type": "i64",
@@ -2027,6 +2737,13 @@
         {
             "name": "netloan",
             "type": "rex_loan",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "onupdate",
+            "type": "onupdate",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

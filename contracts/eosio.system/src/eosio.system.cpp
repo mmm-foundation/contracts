@@ -23,12 +23,15 @@ namespace eosiosystem {
     _rexfunds(_self, _self.value),
     _rexbalance(_self, _self.value),
     _rexorders(_self, _self.value),
-    _guests(_registrator, _registrator.value)
+    _guests(_registrator, _registrator.value),
+    _commitee(_self, _self.value)
    {
       //print( "construct system\n" );
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();
       _gstate2 = _global2.exists() ? _global2.get() : eosio_global_state2{};
       _gstate3 = _global3.exists() ? _global3.get() : eosio_global_state3{};
+      _commstate = _commitee.exists() ? _commitee.get() : eosio_commitee{};
+      
    }
 
    eosio_global_state system_contract::get_default_parameters() {
@@ -61,6 +64,7 @@ namespace eosiosystem {
       _global.set( _gstate, _self );
       _global2.set( _gstate2, _self );
       _global3.set( _gstate3, _self );
+      _commitee.set( _commstate, _self );
    }
 
    void system_contract::setram( uint64_t max_ram_size, double devider ) {
@@ -474,6 +478,9 @@ namespace eosiosystem {
       require_auth( _self );
       check( version.value == 0, "unsupported version for init action" );
 
+      //TODO version 2 and add global economic table
+      
+
       auto itr = _rammarket.find(ramcore_symbol.raw());
       check( itr == _rammarket.end(), "system contract has already been initialized" );
 
@@ -493,6 +500,37 @@ namespace eosiosystem {
 
       INLINE_ACTION_SENDER(eosio::token, open)( token_account, { _self, active_permission },
                                                 { rex_account, core, _self } );
+   
+   }
+
+
+   void system_contract::seteparams( int64_t new_tokens_per_block, int64_t to_producers_percent, int64_t to_saving_percent, int64_t per_block_pay_percent, int64_t per_vote_pay_percent, bool spraying_enabled, int64_t new_tokens_for_spraying, int64_t spraying_period_in_blocks, int64_t spraying_rotation_percent, int64_t spraying_core_funds_percent, name core_host ){
+         
+      require_auth(_self);
+      eosio::check(to_producers_percent + to_saving_percent == 100, "to_producers_percent and to_saving_percent should be 100 in their summ");
+      eosio::check(per_block_pay_percent + per_vote_pay_percent == 100, "per_block_pay_percent and per_vote_pay_percent should be 100 in their summ");
+      
+      if (spraying_enabled == true) {
+      
+         eosio::check(spraying_period_in_blocks > 0, "spraying_period_in_blocks should be more then 0");
+         eosio::check(spraying_rotation_percent + spraying_core_funds_percent == 100, "spraying_rotation_percent and spraying_core_funds_percent should be 100 in their summ");
+         eosio::check(core_host != ""_n, "host for spraying should be setted");
+      } else {
+         eosio::check(spraying_rotation_percent == 0 && spraying_core_funds_percent == 0, "spraying_rotation_percent and spraying_core_funds_percent should be 0");
+      }
+
+      _commstate.new_tokens_per_block = new_tokens_per_block;
+      _commstate.to_producers_percent = to_producers_percent;
+      _commstate.to_saving_percent = to_saving_percent;
+      _commstate.per_block_pay_percent = per_block_pay_percent;
+      _commstate.per_vote_pay_percent = per_vote_pay_percent;
+      _commstate.spraying_enabled = spraying_enabled;
+      _commstate.new_tokens_for_spraying = new_tokens_for_spraying;
+      _commstate.spraying_period_in_blocks = spraying_period_in_blocks;
+      _commstate.spraying_rotation_percent = spraying_rotation_percent;
+      _commstate.spraying_core_funds_percent = spraying_core_funds_percent;
+      _commstate.core_host = core_host;
+      
    }
 
 
@@ -508,42 +546,202 @@ namespace eosiosystem {
       require_auth(core_account);
       check(compensate_asset.symbol == system_contract::get_core_symbol(), "Only core symbol can be used for compensation");
 
-      INLINE_ACTION_SENDER(eosio::token, issue) (
-            token_account, { {_self, active_permission} },
-            { core_host, compensate_asset, std::string("issue tokens for risk compensation") }
-      );
+      INLINE_ACTION_SENDER(eosio::token, transfer)(
+          token_account, { {saving_account, active_permission} },
+          { saving_account, core_account, compensate_asset, std::string("transfers tokens from reserve for risk compensation")}
+     );
 
    }
 
+   void system_contract::putreserve(const name contract, const name username, const asset quantity, const std::string memo){
+      require_auth(saving_account);
+
+      funds_index funds(_self, _self.value);
+      auto by_contract_and_symbol = funds.template get_index<"codeandsmbl"_n>();
+      auto by_contract_and_symbol_ids = combine_ids(contract.value, quantity.symbol.code().raw());    
+      auto fund = by_contract_and_symbol.find(by_contract_and_symbol_ids);
+      
+      if (fund == by_contract_and_symbol.end()) {
+          funds.emplace(_self, [&](auto &f){
+            f.id = funds.available_primary_key();
+            f.quantity = quantity;
+            f.contract = contract;
+          });
+      } else {
+          by_contract_and_symbol.modify(fund, _self, [&](auto &f){
+            f.quantity += quantity;
+          });
+      }
+   }
+
+   void system_contract::addben( eosio::name producer, eosio::name benefactor, std::string memo) {
+      
+      require_auth(producer);
+      benefactors_index benefactors(_self, _self.value);
+
+      auto by_producer_and_benefactor = benefactors.template get_index<"byprodben"_n>();
+      auto by_producer_and_benefactor_ids = combine_ids(producer.value, benefactor.value);    
+      auto ben = by_producer_and_benefactor.find(by_producer_and_benefactor_ids);
+      
+      eosio::check(ben == by_producer_and_benefactor.end(), "Benefactor is already exist for current producer");
+      
+      //TODO check not more then 12 benefactors for one producer
+
+      benefactors.emplace(producer, [&](auto &b) {
+         b.id = benefactors.available_primary_key();
+         b.producer = producer;
+         b.benefactor = benefactor;
+         b.memo = memo;
+         b.installed_at = current_time_point();
+      });
+
+   }
+
+   void system_contract::delben( eosio::name producer, eosio::name benefactor ) {
+   
+      require_auth(producer);
+
+      benefactors_index benefactors(_self, _self.value);
+      auto by_producer_and_benefactor = benefactors.template get_index<"byprodben"_n>();
+      auto by_producer_and_benefactor_ids = combine_ids(producer.value, benefactor.value);    
+      auto ben = by_producer_and_benefactor.find(by_producer_and_benefactor_ids);
+      
+      eosio::check(ben != by_producer_and_benefactor.end(), "Benefactor is not founded");
+      
+      by_producer_and_benefactor.erase(ben);
+
+   }
+
+
+   void system_contract::takereserve(const name host, const name token_contract, const asset amount, const std::string memo){
+      require_auth(core_account);
+      
+      //TODO переделать логику капитально! 
+
+      funds_index funds(_self, _self.value);
+      
+      auto by_contract_and_symbol = funds.template get_index<"codeandsmbl"_n>();
+      auto by_contract_and_symbol_ids = combine_ids(token_contract.value, amount.symbol.code().raw());    
+      auto fund = by_contract_and_symbol.find(by_contract_and_symbol_ids);
+      
+      eosio::check(fund != by_contract_and_symbol.end(), "Reserve fund for current token is not found");
+      eosio::check(fund -> quantity >= amount, "Not enought reserve amount for take");
+      
+      //проверяю на системный токен
+      if (token_contract == "eosio.token"_n && amount.symbol == system_contract::get_core_symbol()){
+         //если системный - получаю производителей
+         auto idx = _producers.get_index<"prototalvote"_n>();
+         bool is_top_producer = false;
+         uint64_t top_producers = 0;
+
+         //проверяю топ-21 производителей на соответствие хосту
+         for ( auto it = idx.cbegin(); it != idx.cend() && top_producers < 21 && 0 < it->total_votes && it->active(); ++it ) {
+            top_producers += 1;
+            is_top_producer = true;
+
+            if (it -> owner == host ) {
+               //эмитирую из резерва на хоста
+               by_contract_and_symbol.modify(fund, _self, [&](auto &f) {
+                  f.quantity -= amount;
+               });
+               action(
+                  permission_level{ _self, "active"_n },
+                  core_account, "emitquote"_n,
+                  std::make_tuple( host, amount, token_contract) 
+               ).send();
+               INLINE_ACTION_SENDER(eosio::token, transfer) (
+                token_contract, { {saving_account, active_permission} },
+                { saving_account, core_account, amount, memo }
+              );
+
+            } 
+         }
+
+
+         //Эмиссия на бенефакторов 
+         benefactors_index benefactors(_self, _self.value);
+         auto by_producer_and_benefactor = benefactors.template get_index<"byben"_n>();
+         auto by_producer_and_benefactor_ids = host.value; 
+
+         auto ben = by_producer_and_benefactor.find(by_producer_and_benefactor_ids);
+
+         if (ben != by_producer_and_benefactor.end()) {
+            auto idx = _producers.get_index<"prototalvote"_n>();
+            top_producers = 0;
+            for ( auto it = idx.cbegin(); it != idx.cend() && top_producers < 21 && 0 < it->total_votes && it->active(); ++it ) {
+               if (ben -> producer == it -> owner ) {
+                  //эмитирую из резерва на хоста
+                  by_contract_and_symbol.modify(fund, _self, [&](auto &f) {
+                     f.quantity -= amount;
+                  });
+
+                  action(
+                     permission_level{ _self, "active"_n },
+                     core_account, "emitquote"_n,
+                     std::make_tuple( host, amount, token_contract) 
+                  ).send();
+
+                  INLINE_ACTION_SENDER(eosio::token, transfer) (
+                   token_contract, { {saving_account, active_permission} },
+                   { saving_account, core_account, amount, memo }
+                 );
+                  
+               }
+            }
+         }
+
+      } else {
+        eosio::check(false, "Only system token can be used for now");
+        //  by_contract_and_symbol.modify(fund, _self, [&](auto &f) {
+        //     f.quantity -= amount;
+        //  });
+
+        //  INLINE_ACTION_SENDER(eosio::token, transfer) (
+        //   token_contract, { {saving_account, active_permission} },
+        //   { saving_account, core_account, amount, memo }
+        // );
+        // action(
+               //    permission_level{ _self, "active"_n },
+               //    core_account, "emitquote"_n,
+               //    std::make_tuple( host, amount, token_contract) 
+               // ).send();
+               
+      }
+
+
+   };
+
    void system_contract::inprodincome(const name contract, const asset income) {
       require_auth(core_account);
-      check(income.symbol == system_contract::get_core_symbol(), "Only core symbol can be used for compensation");
-      check(contract == "eosio.token"_n, "Wrong token contract");
+      // check(income.symbol == system_contract::get_core_symbol(), "Only core symbol can be used for compensation");
+      // check(contract == "eosio.token"_n, "Wrong token contract");
 
       if (contract ==  "eosio.token"_n && income.symbol == system_contract::get_core_symbol()){
          //FOR NATIVE
-         auto to_producers = income / 10; // 10% to producers
-         auto to_saving = income - to_producers; // 90% to saving
-
-         auto to_per_block_pay = to_producers.amount / 5;
-         auto to_per_vote_pay = to_producers.amount - to_per_block_pay;
          
+         uint64_t to_producers = uint64_t((double)income.amount * (double)_commstate.to_producers_percent / 100); 
+         uint64_t to_saving   = uint64_t((double)income.amount * (double)_commstate.to_saving_percent / 100); 
+
+         uint64_t to_per_block_pay = uint64_t((double)to_producers * (double)_commstate.per_block_pay_percent / 100);
+         uint64_t to_per_vote_pay  = uint64_t((double)to_producers * (double)_commstate.per_vote_pay_percent / 100);
+         
+
          funds_index funds(_self, _self.value);
          auto by_contract_and_symbol = funds.template get_index<"codeandsmbl"_n>();
-         auto by_contract_and_symbol_ids = combine_ids(contract.value, to_saving.symbol.code().raw());    
+         auto by_contract_and_symbol_ids = combine_ids(contract.value, income.symbol.code().raw());    
          auto fund = by_contract_and_symbol.find(by_contract_and_symbol_ids);
        
-         if (fund == by_contract_and_symbol.end()){
+         if (fund == by_contract_and_symbol.end()) {
              funds.emplace(_self, [&](auto &f){
                f.id = funds.available_primary_key();
-               f.quantity = to_saving;
+               f.quantity = asset(to_saving, core_symbol());
                f.contract = contract;
              });
          } else {
              by_contract_and_symbol.modify(fund, _self, [&](auto &f){
-               f.quantity += to_saving;
+               f.quantity += asset(to_saving, core_symbol());
              });
-           }
+         }
          
         INLINE_ACTION_SENDER(eosio::token, transfer)(
           contract, { {core_account, active_permission} },
@@ -553,6 +751,11 @@ namespace eosiosystem {
         INLINE_ACTION_SENDER(eosio::token, transfer)(
           contract, { {core_account, active_permission} },
           { core_account, vpay_account, asset(to_per_vote_pay, core_symbol()), "fund per-vote bucket" }
+        );
+
+        INLINE_ACTION_SENDER(eosio::token, transfer)(
+          contract, { {core_account, active_permission} },
+          { core_account, saving_account, asset(to_saving, core_symbol()), "to saving global fund" }
         );
 
          _gstate.pervote_bucket          += to_per_vote_pay;
@@ -579,6 +782,11 @@ namespace eosiosystem {
             f.quantity += to_saving;
           });
         }
+
+         INLINE_ACTION_SENDER(eosio::token, transfer) (
+          contract, { {core_account, active_permission} },
+          { core_account, saving_account, to_saving, "to saving global fund" }
+        );
       }
       
 
@@ -593,7 +801,7 @@ EOSIO_DISPATCH( eosiosystem::system_contract,
      // native.hpp (newaccount definition is actually in eosio.system.cpp)
      (newaccount)(updateauth)(deleteauth)(linkauth)(unlinkauth)(canceldelay)(onerror)(setabi)
      // eosio.system.cpp
-     (init)(setram)(setramrate)(setparams)(setpriv)(setalimits)(setacctram)(setacctnet)(setacctcpu)
+     (init)(seteparams)(setram)(setramrate)(setparams)(setpriv)(setalimits)(setacctram)(setacctnet)(setacctcpu)
      (rmvproducer)(updtrevision)(bidname)(bidrefund)
      // rex.cpp
      (deposit)(withdraw)(buyrex)(unstaketorex)(sellrex)(cnclrexorder)(rentcpu)(rentnet)(fundcpuloan)(fundnetloan)
@@ -603,6 +811,9 @@ EOSIO_DISPATCH( eosiosystem::system_contract,
      // voting.cpp
      (regproducer)(unregprod)(voteproducer)(regproxy)
      // producer_pay.cpp
-     (onblock)(claimrewards)
+     (onblock)(claimrewards)(update)(pushupdate)
+     (checkstatus)
      (activate)(compensate)(inprodincome)
+     (putreserve)(takereserve)
+     (addben)(delben)
 )

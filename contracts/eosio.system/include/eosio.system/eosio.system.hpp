@@ -72,6 +72,27 @@ namespace eosiosystem {
    typedef eosio::multi_index< "emission"_n, emission> emission_index;
 
 
+   struct [[eosio::table, eosio::contract("eosio.system")]] benefactors { 
+      uint64_t id;
+      eosio::name producer; 
+      eosio::name benefactor;
+      std::string memo;
+      eosio::time_point_sec installed_at;
+
+      uint64_t primary_key()const { return id;}
+      uint64_t byprod() const {return producer.value;}
+      uint64_t byben() const {return benefactor.value;}
+      uint128_t byprodben() const {return combine_ids(producer.value, benefactor.value);}
+      
+   };
+
+   typedef eosio::multi_index< "benefactors"_n, benefactors,
+     indexed_by<"byprod"_n, const_mem_fun<benefactors, uint64_t, &benefactors::byprod>>,
+     indexed_by<"byben"_n, const_mem_fun<benefactors, uint64_t, &benefactors::byben>>,
+     indexed_by<"byprodben"_n, const_mem_fun<benefactors, uint128_t, &benefactors::byprodben>>
+   > benefactors_index;
+
+
    struct [[eosio::table, eosio::contract("eosio.system")]] funds {
      uint64_t        id;
      name            contract;
@@ -164,6 +185,26 @@ namespace eosiosystem {
       EOSLIB_SERIALIZE( eosio_global_state3, (last_vpay_state_update)(total_vpay_share_change_rate) )
    };
 
+
+   struct [[eosio::table("commitee"), eosio::contract("eosio.system")]] eosio_commitee {
+      eosio_commitee() { }
+
+      int64_t new_tokens_per_block = 0;//0.4000 SYS
+      int64_t to_producers_percent = 10; //10%
+      int64_t to_saving_percent = 90; //10%
+      int64_t per_block_pay_percent = 25; //25%
+      int64_t per_vote_pay_percent = 75; //25%
+      bool    spraying_enabled = false;
+      int64_t new_tokens_for_spraying = 0;//1000.0000 SYS
+      int64_t spraying_period_in_blocks = 7200; //1 hour
+      int64_t spraying_rotation_percent = 10; //10%
+      int64_t spraying_core_funds_percent = 90; //10%
+      name     core_host;
+
+      EOSLIB_SERIALIZE( eosio_commitee, (new_tokens_per_block)(to_producers_percent)(to_saving_percent)(per_block_pay_percent)(per_vote_pay_percent)(spraying_enabled)(new_tokens_for_spraying)(spraying_period_in_blocks)(spraying_rotation_percent)(spraying_core_funds_percent)(core_host))
+   };
+
+
    struct [[eosio::table, eosio::contract("eosio.system")]] producer_info {
       name                  owner;
       double                total_votes = 0;
@@ -244,6 +285,8 @@ namespace eosiosystem {
    typedef eosio::singleton< "global2"_n, eosio_global_state2 > global_state2_singleton;
    typedef eosio::singleton< "global3"_n, eosio_global_state3 > global_state3_singleton;
 
+   typedef eosio::singleton< "commitee"_n, eosio_commitee > global_commitee_singleton;
+
    static constexpr uint32_t     seconds_per_day = 24 * 3600;
 
 
@@ -272,11 +315,280 @@ namespace eosiosystem {
     typedef eosio::multi_index<"guests"_n, guests,
        eosio::indexed_by< "byexpr"_n, eosio::const_mem_fun<guests, uint64_t, 
                       &guests::byexpr>>
-    > guests_inex;
+    > guests_index;
+
+
+
+/*!
+   \brief Структура целей хоста Двойной Спирали.
+*/
+
+    struct [[eosio::table, eosio::contract("eosio.system")]]  goals {
+        uint64_t id;
+        uint64_t parent_id;
+        eosio::name type;
+        eosio::name creator;
+
+        eosio::name benefactor;
+        eosio::name host;
+        
+        eosio::name status;
+        eosio::name who_can_create_tasks;
+        
+        uint64_t benefactors_weight;
+        
+        uint64_t duration;
+        uint64_t priority = 1;
+        
+        std::string title;
+        std::string description;
+        
+        eosio::asset target;
+        
+        eosio::asset target1;
+        eosio::asset target2;
+        
+        
+        eosio::asset available;
+        eosio::asset withdrawed;
+        
+        uint64_t debt_count;
+        eosio::asset debt_amount;
+
+        uint64_t positive_votes;
+        uint64_t negative_votes;
+        uint64_t filled_votes;
+        uint64_t total_tasks;
+        uint64_t total_reports;
+        uint64_t approved_reports;
+        
+        bool is_encrypted = false;
+        std::string public_key;
+
+        eosio::time_point_sec created;
+        eosio::time_point_sec start_at;
+        eosio::time_point_sec finish_at;
+        eosio::time_point_sec expired_at;
+
+        std::vector<eosio::name> voters;        
+
+        std::string report;
+        std::string meta;
+
+        uint64_t second_circuit_votes;
+        eosio::asset total_asset_on_distribution;
+        eosio::asset remain_asset_on_distribution;
+        
+        uint64_t total_power_on_distribution;
+        uint64_t remain_power_on_distribution;
+
+
+
+        
+        uint64_t primary_key()const { return id; }
+      
+        uint64_t byvotes() const { 
+            return positive_votes;
+        }
+
+        uint64_t bynvotes() const { 
+            return negative_votes;
+        }
+
+        // double byvotes() const { 
+        //     return (double)total_votes; 
+        // }
+        
+        // uint64_t byvotes() const { 
+        //     return -uint64_t(uint128_t(total_votes) + pow(2, 63));
+        // }
+
+        uint64_t bytype() const {return type.value;}
+        uint64_t bystatus() const {return status.value;}
+        uint64_t byparentid() const {return parent_id;}
+
+        
+        uint64_t bycreated() const {return created.sec_since_epoch(); }
+        uint64_t bypriority() const {return priority; }
+        uint64_t byusername() const {return creator.value; }
+        uint64_t byhost() const {return host.value;}
+        
+        uint128_t by_username_and_host() const { return combine_ids(creator.value, host.value); }
+
+        
+        EOSLIB_SERIALIZE( goals, (id)(parent_id)(type)(creator)(benefactor)(host)(status)(who_can_create_tasks)(benefactors_weight)(duration)(priority)(title)(description)(target)(target1)(target2)(available)(withdrawed)(debt_count)(debt_amount)(positive_votes)(negative_votes)(filled_votes)(total_tasks)
+            (total_reports)(approved_reports)(is_encrypted)(public_key)(created)(start_at)(finish_at)(expired_at)(voters)(report)(meta)
+            (second_circuit_votes)(total_asset_on_distribution)(remain_asset_on_distribution)(total_power_on_distribution)(remain_power_on_distribution))
+    };
+
+    typedef eosio::multi_index <"goals"_n, goals,
+        eosio::indexed_by<"byhost"_n, eosio::const_mem_fun<goals, uint64_t, &goals::byhost>>,
+        eosio::indexed_by<"bystatus"_n, eosio::const_mem_fun<goals, uint64_t, &goals::bystatus>>,
+        eosio::indexed_by<"type"_n, eosio::const_mem_fun<goals, uint64_t, &goals::bytype>>,
+        eosio::indexed_by<"votes"_n, eosio::const_mem_fun<goals, uint64_t, &goals::byvotes>>,
+        eosio::indexed_by<"nvotes"_n, eosio::const_mem_fun<goals, uint64_t, &goals::bynvotes>>,
+        eosio::indexed_by<"byparentid"_n, eosio::const_mem_fun<goals, uint64_t, &goals::byparentid>>,
+        eosio::indexed_by<"creator"_n, eosio::const_mem_fun<goals, uint64_t, &goals::byusername>>,
+        eosio::indexed_by<"created"_n, eosio::const_mem_fun<goals, uint64_t, &goals::bycreated>>,
+        eosio::indexed_by<"bypriority"_n, eosio::const_mem_fun<goals, uint64_t, &goals::bypriority>>
+        
+    > goals_index;
 
 
 
 
+
+/*!
+   \brief Структура учёта партнёров и их статусов у хоста Двойной Спирали.
+*/
+    struct  [[eosio::table, eosio::contract("eosio.system")]] corepartners {
+        eosio::name username;
+        eosio::name status;
+        eosio::asset total_good;
+        eosio::asset sediment;
+        eosio::time_point_sec join_at;
+        eosio::time_point_sec expiration;
+
+        uint64_t primary_key() const {return username.value;}
+        uint64_t bygood() const {return total_good.amount;}
+        uint64_t byexpiration() const {return expiration.sec_since_epoch();}
+
+        EOSLIB_SERIALIZE(corepartners, (username)(status)(total_good)(sediment)(join_at)(expiration))
+    };
+
+    typedef eosio::multi_index<"corepartners"_n, corepartners,
+      eosio::indexed_by<"bygood"_n, eosio::const_mem_fun<corepartners, uint64_t, &corepartners::bygood>>,
+      eosio::indexed_by<"byexpiration"_n, eosio::const_mem_fun<corepartners, uint64_t, &corepartners::byexpiration>>
+    > corepartners_index;
+
+
+
+/*!
+   \brief Структура балансов пользователя у всех хостов Двойной Спирали
+*/
+    
+ 
+    struct [[eosio::table, eosio::contract("eosio.system")]] balance4 {
+        uint64_t id;
+        eosio::name owner;
+        eosio::name host;
+        eosio::name chost;
+        eosio::name status = "process"_n;
+        uint64_t cycle_num;
+        uint64_t pool_num;
+        uint64_t global_pool_id;
+        uint64_t quants_for_sale;
+        uint64_t next_quants_for_sale;
+        uint64_t last_recalculated_win_pool_id = 1;
+        bool win = false; //true if win, false if lose or nominal
+        int64_t root_percent;
+        int64_t convert_percent;
+        std::string pool_color;
+        eosio::asset available; 
+        eosio::asset purchase_amount;
+        eosio::asset compensator_amount;
+        eosio::asset start_convert_amount;
+        eosio::asset if_convert; 
+        eosio::asset if_convert_to_power;
+        eosio::asset solded_for;
+        bool withdrawed = false;
+        std::vector<eosio::asset> forecasts;
+        eosio::asset ref_amount; 
+        eosio::asset dac_amount;
+        eosio::asset cfund_amount;
+        eosio::asset hfund_amount;
+        eosio::asset sys_amount;
+
+        std::string meta; 
+
+        uint64_t primary_key() const {return id;}
+        uint64_t byowner() const {return owner.value;}
+        uint64_t byavailable() const {return available.amount;}
+        uint64_t bystatus() const {return status.value;}
+
+
+        EOSLIB_SERIALIZE(balance4, (id)(owner)(host)(chost)(status)(cycle_num)(pool_num)(global_pool_id)(quants_for_sale)(next_quants_for_sale)(last_recalculated_win_pool_id)(win)(root_percent)(convert_percent)(pool_color)(available)(purchase_amount)(compensator_amount)(start_convert_amount)(if_convert)(if_convert_to_power)(solded_for)(withdrawed)(forecasts)(ref_amount)(dac_amount)(cfund_amount)(hfund_amount)(sys_amount)(meta))
+    
+        eosio::name get_ahost() const {
+            if (host == chost)
+                return host;
+            else
+                return chost;
+        }
+    };
+
+    typedef eosio::multi_index<"balance4"_n, balance4,
+        eosio::indexed_by<"byowner"_n, eosio::const_mem_fun<balance4, uint64_t, &balance4::byowner>>,
+        eosio::indexed_by<"byavailable"_n, eosio::const_mem_fun<balance4, uint64_t, &balance4::byavailable>>,
+        eosio::indexed_by<"bystatus"_n, eosio::const_mem_fun<balance4, uint64_t, &balance4::bystatus>>
+    > balance_index;
+
+
+
+   struct [[eosio::table,eosio::contract("eosio.system")]] onupdate {
+      eosio::name host;
+      uint64_t current_cycle_num;
+      uint64_t current_pool_id;
+      uint64_t current_balance_id;
+      // uint64_t last_updated_cycle_num;
+      // uint64_t last_updated_pool_id;
+      bool update_balances_is_finish = false;
+      bool convert_to_goals_is_finish = false;
+      bool convert_from_goals_is_finish = false;
+      eosio::time_point_sec pool_expired_at;
+      eosio::time_point_sec window_expired_at;
+
+      uint64_t primary_key()const { return host.value; }
+      
+      uint64_t isupdated() const {
+         return update_balances_is_finish ? 1 : 0;
+      }
+
+      uint64_t iscnvrtdto() const {
+         return convert_to_goals_is_finish ? 1 : 0;
+      }
+
+      uint64_t iscnvrtdback() const {
+         return convert_from_goals_is_finish ? 1 : 0;
+      }
+
+      uint64_t byexpired() const {
+         return pool_expired_at.sec_since_epoch();
+      }
+      uint64_t bywexpired() const {
+         return window_expired_at.sec_since_epoch();
+      }
+
+   };
+
+   typedef eosio::multi_index< "onupdate"_n, onupdate,
+      eosio::indexed_by<"isupdated"_n, eosio::const_mem_fun<onupdate, uint64_t, &onupdate::isupdated>>,
+      eosio::indexed_by<"iscnvrtdto"_n, eosio::const_mem_fun<onupdate, uint64_t, &onupdate::iscnvrtdto>>,
+      eosio::indexed_by<"iscnvrtdback"_n, eosio::const_mem_fun<onupdate, uint64_t, &onupdate::iscnvrtdback>>,
+      eosio::indexed_by<"byexpired"_n, eosio::const_mem_fun<onupdate, uint64_t, &onupdate::byexpired>>,
+      eosio::indexed_by<"bywexpired"_n, eosio::const_mem_fun<onupdate, uint64_t, &onupdate::bywexpired>>
+    > onupdate_index;
+
+
+
+
+/*!
+   \brief Структура для учёта развития циклов хоста Двойной Спирали.
+*/
+
+    struct [[eosio::table, eosio::contract("eosio.system")]] cycle {
+        uint64_t id;
+        eosio::name ahost;
+        uint64_t start_at_global_pool_id;
+        uint64_t finish_at_global_pool_id;
+        eosio::asset emitted;
+        uint64_t primary_key() const {return id;}
+
+        EOSLIB_SERIALIZE(cycle, (id)(ahost)(start_at_global_pool_id)(finish_at_global_pool_id)(emitted));
+    };
+
+    typedef eosio::multi_index<"cycle"_n, cycle> cycle_index;
+    
 
    struct [[eosio::table,eosio::contract("eosio.system")]] rex_pool {
       uint8_t    version = 0;
@@ -381,8 +693,10 @@ namespace eosiosystem {
          rex_fund_table          _rexfunds;
          rex_balance_table       _rexbalance;
          rex_order_table         _rexorders;
-         guests_inex             _guests;
-         
+         guests_index             _guests;
+         global_commitee_singleton _commitee;
+         eosio_commitee          _commstate;
+
       public:
          static constexpr eosio::name active_permission{"active"_n};
          static constexpr eosio::name token_account{"eosio.token"_n};
@@ -392,14 +706,13 @@ namespace eosiosystem {
          static constexpr eosio::name bpay_account{"eosio.bpay"_n};
          static constexpr eosio::name vpay_account{"eosio.vpay"_n};
          static constexpr eosio::name names_account{"eosio.names"_n};
-         static constexpr eosio::name saving_account{"eosio.saving"_n};
+         static constexpr eosio::name saving_account{"reserve"_n};
          static constexpr eosio::name rex_account{"eosio.rex"_n};
          static constexpr eosio::name null_account{"eosio.null"_n};
 
          static constexpr eosio::name p2p_account{"p2p"_n}; //p2p
          static constexpr eosio::name core_account{"unicore"_n}; //core.y
-         static constexpr eosio::name core_host{"community"_n}; //core
-
+         
          static constexpr symbol ramcore_symbol = symbol(symbol_code("RAMCORE"), 4);
          static constexpr symbol ram_symbol     = symbol(symbol_code("RAM"), 0);
          static constexpr symbol rex_symbol     = symbol(symbol_code("REX"), 4);
@@ -419,6 +732,15 @@ namespace eosiosystem {
          void init( unsigned_int version, symbol core, int64_t init_market_amount );
          
          [[eosio::action]]
+         void update(  );
+
+         [[eosio::action]]
+         void checkstatus(  );
+
+         [[eosio::action]]
+         void seteparams( int64_t new_tokens_per_block, int64_t to_producers_percent, int64_t to_saving_percent, int64_t per_block_pay_percent, int64_t per_vote_pay_percent, bool spraying_enabled, int64_t new_tokens_for_spraying, int64_t spraying_period_in_blocks, int64_t spraying_rotation_percent, int64_t spraying_core_funds_percent, name core_host );
+            
+         [[eosio::action]]
          void onblock( ignore<block_header> header );
 
          [[eosio::action]]
@@ -430,6 +752,12 @@ namespace eosiosystem {
          [[eosio::action]]
          void inprodincome( name contract, asset income);
 
+         [[eosio::action]]
+         void takereserve(name host, name token_contract, asset amount, std::string memo);
+
+         [[eosio::action]]
+         void putreserve(name contract, name username, asset quantity, std::string memo);
+   
          [[eosio::action]]
          void setalimits( name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight );
 
@@ -665,7 +993,25 @@ namespace eosiosystem {
          [[eosio::action]]
          void bidrefund( name bidder, name newname );
 
+         [[eosio::action]]
+         void pushupdate(eosio::name host, uint64_t current_cycle_num, uint64_t current_pool_id, eosio::time_point_sec pool_expired_at, eosio::time_point_sec window_expired_at);
+
+         [[eosio::action]]
+         void addben(eosio::name producer, eosio::name benefactor, std::string memo);
+         
+         [[eosio::action]]
+         void delben( eosio::name producer, eosio::name benefactor );
+         
+
          using init_action = eosio::action_wrapper<"init"_n, &system_contract::init>;
+         
+         using addben_action = eosio::action_wrapper<"addben"_n, &system_contract::addben>;
+         using delben_action = eosio::action_wrapper<"delben"_n, &system_contract::delben>;
+         
+         using update_action = eosio::action_wrapper<"update"_n, &system_contract::update>;
+         using checkstatus_action = eosio::action_wrapper<"checkstatus"_n, &system_contract::checkstatus>;
+         
+         using seteparams_action = eosio::action_wrapper<"seteparams"_n, &system_contract::seteparams>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
          using setacctnet_action = eosio::action_wrapper<"setacctnet"_n, &system_contract::setacctnet>;
          using setacctcpu_action = eosio::action_wrapper<"setacctcpu"_n, &system_contract::setacctcpu>;
@@ -728,6 +1074,7 @@ namespace eosiosystem {
          void update_ram_supply();
 
          // defined in rex.cpp
+
          void runrex( uint16_t max );
          void update_resource_limits( const name& from, const name& receiver, int64_t delta_net, int64_t delta_cpu );
          void check_voting_requirement( const name& owner,
@@ -779,6 +1126,9 @@ namespace eosiosystem {
          double update_total_votepay_share( time_point ct,
                                             double additional_shares_delta = 0.0, double shares_rate_delta = 0.0 );
 
+         void emit(block_timestamp timestamp);
+
+         
          template <auto system_contract::*...Ptrs>
          class registration {
             public:
