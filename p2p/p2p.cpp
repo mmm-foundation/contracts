@@ -777,7 +777,6 @@ void p2p::approve(name username, uint64_t id)
  */
 void p2p::cancel(name username, uint64_t id)
 {
-    // require_auth( username );
     eosio::check(has_auth(username) || has_auth(_me), "missing required authority");
        
     orders_index orders(_me, _me.value);
@@ -785,6 +784,12 @@ void p2p::cancel(name username, uint64_t id)
     eosio::check(order != orders.end(), "Order is not found");
     
     if (order -> parent_id == 0) {
+
+      //TODO find first element with parent and check
+      auto orders_by_parent = orders.template get_index<"byparentid"_n>();
+      auto has_child = orders_by_parent.find(order->id) == orders_by_parent.end() ? false : true;
+
+      eosio::check(!has_child, "Cannot cancel order before cancel incoming orders");
 
       eosio::check(order -> creator == username || has_auth(_me), "Only creator can cancel order");
     
@@ -835,19 +840,12 @@ void p2p::cancel(name username, uint64_t id)
 
           o.quote_remain += order -> quote_quantity;
           o.quote_locked -= order -> quote_quantity;
-          // o.out_remain += order -> out_quantity;
-          // o.out_locked -= order -> out_quantity;
-
+          
         });
 
       } else if (order -> status == "waiting"_n) {
-        // if (parent_order -> root_remain.amount == 0) {
           eosio::check(has_auth(order->creator) || has_auth(order->parent_creator) || has_auth(_me), "missing required authority");
-        // } else {
-          // eosio::check(order -> creator == username, "Only creator can cancel order2");
-        // }
-
-
+        
         if (order -> type == "sell"_n) {
           action (
               permission_level{ _me, "active"_n },

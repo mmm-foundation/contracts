@@ -94,7 +94,7 @@ public:
     static constexpr eosio::name _me = "p2p"_n;                                             /*!< собственное имя аккаунта контракта */
     static constexpr eosio::name _curator = "p2p"_n;                                        /*!< дефолтное имя аккаунта куратора всех сделок */
     static constexpr eosio::name _rater = "rater"_n;                                        /*!< имя аккаунта поставщика курсов */
-    static constexpr eosio::symbol _SYM     = eosio::symbol(eosio::symbol_code("FLOWER"), 4);  /*!< системный токен */
+    static constexpr eosio::symbol _SYM     = eosio::symbol(eosio::symbol_code("MAVRO"), 4);  /*!< системный токен */
     static constexpr eosio::name _core = "unicore"_n;                                       /*!< имя аккаунта распределения реферальных бонусов в сеть */
     static constexpr eosio::name _CORE_SALE_ACCOUNT = "core"_n;                             /*!< аккаунт системного продавца токенов, в сделке к которым срабатывает вестинг */
     static constexpr eosio::name _REGISTRATOR_ACCOUNT = "registrator"_n;                    /*!< аккаунт контракта регистратора, хранящего таблицу с гостями для подарочного выкупа */
@@ -260,7 +260,7 @@ public:
         name status;                                /*!< статус ордера: waiting / process / payed / finish / dispute */ 
         eosio::time_point_sec expired_at;           /*!< дата истечения срока давности ордера */ 
         eosio::time_point_sec created_at;           /*!< дата создания ордера */ 
-
+        
         uint64_t primary_key()const { return id; }                              /*!< return id - primary_key */
         uint64_t bycurrcode() const {return out_currency_code;}                 /*!< out_currency_code - secondary_key 2 */
 
