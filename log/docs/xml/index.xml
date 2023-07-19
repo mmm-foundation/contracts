@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.9.3" xml:lang="en-US">
+  <compound refid="structlog_1_1comments" kind="struct"><name>log::comments</name>
+    <member refid="structlog_1_1comments_1ad50b5353b242f9c68ead22cc0e44425a" kind="variable"><name>hash</name></member>
+    <member refid="structlog_1_1comments_1a519ef0a922064f6a1704f1dcc838cbc7" kind="variable"><name>parent_hash</name></member>
+    <member refid="structlog_1_1comments_1a621064544334c8379392ee7bb1d60543" kind="variable"><name>author</name></member>
+    <member refid="structlog_1_1comments_1a4afa7b6695173423f88556182a0edbc7" kind="variable"><name>permlink</name></member>
+    <member refid="structlog_1_1comments_1a7a546f8092c777aa1023d34a7dc696a5" kind="variable"><name>parent_author</name></member>
+    <member refid="structlog_1_1comments_1af4735e901a624903180746e7872346aa" kind="variable"><name>parent_permlink</name></member>
+    <member refid="structlog_1_1comments_1ab2f982108778520a85c9dfdb6623a452" kind="variable"><name>body</name></member>
+    <member refid="structlog_1_1comments_1a2f97406cc24f94c92aa26ff4493553e1" kind="variable"><name>title</name></member>
+    <member refid="structlog_1_1comments_1a1df61febbbc2e86b470a9dd3435593f2" kind="variable"><name>meta</name></member>
+    <member refid="structlog_1_1comments_1a783202937f14cc8d6ce688f99c15013c" kind="variable"><name>created</name></member>
+    <member refid="structlog_1_1comments_1aee27d31f4e9a13e1efc41cc56cc316ed" kind="variable"><name>last_update</name></member>
+    <member refid="structlog_1_1comments_1a95430cf8710e261873c47843854f2067" kind="variable"><name>is_encrypted</name></member>
+    <member refid="structlog_1_1comments_1ae9a657378568f58ddf77528c4f9ef697" kind="variable"><name>public_key</name></member>
+    <member refid="structlog_1_1comments_1a6fa6611124fc1885be4a684df0992143" kind="variable"><name>comments_is_enabled</name></member>
+    <member refid="structlog_1_1comments_1ab997eedbdb2311c1962366ddfab7ebba" kind="variable"><name>priority</name></member>
+    <member refid="structlog_1_1comments_1afb980eb2b96e78b95a2288b4cd885518" kind="function"><name>primary_key</name></member>
+  </compound>
+  <compound refid="classlog" kind="class"><name>log</name>
+    <member refid="group__public__consts_1gaf276fa07b1affd33d4b823e2ba51cc69" kind="variable"><name>_me</name></member>
+    <member refid="group__public__consts_1gaafc269ed5e4c22e6fa0ed79e744ebd7b" kind="variable"><name>MIN_PERMLINK_LENGTH</name></member>
+    <member refid="group__public__consts_1gacf95aa9d7aa3c83c92526f7e9f43b022" kind="variable"><name>MAX_PERMLINK_LENGTH</name></member>
+    <member refid="classlog_1a131176b2a527d221cf3e820a8282d1bb" kind="typedef"><name>comments_index</name></member>
+    <member refid="classlog_1a3513bdaa78fafe2a389d78914bbc6e1e" kind="function"><name>log</name></member>
+    <member refid="group__public__actions_1ga6bde994fdc6dec338a07ac007605a500" kind="function"><name>post</name></member>
+    <member refid="group__public__actions_1gac7ad5c8dfbb613aefe5efaa12849403e" kind="function"><name>del</name></member>
+    <member refid="classlog_1adc9eac7a444fc9adc4d47e222dab794d" kind="function"><name>apply</name></member>
+    <member refid="classlog_1ad26e52a22654dfa466153ca018ac2a61" kind="function"><name>combine_ids</name></member>
+  </compound>
+  <compound refid="namespaceeosio" kind="namespace"><name>eosio</name>
+  </compound>
+  <compound refid="log_8cpp" kind="file"><name>log.cpp</name>
+    <member refid="log_8cpp_1a37e7c828d50e126bd57dba81208af131" kind="function"><name>validate_permlink</name></member>
+    <member refid="log_8cpp_1a569d3d0ca7b56fb8c580faaa3d73179a" kind="function"><name>apply</name></member>
+  </compound>
+  <compound refid="log_8hpp" kind="file"><name>log.hpp</name>
+  </compound>
+  <compound refid="_r_e_a_d_m_e_8md" kind="file"><name>README.md</name>
+  </compound>
+  <compound refid="group__public__consts" kind="group"><name>public_consts</name>
+    <member refid="group__public__consts_1gaf276fa07b1affd33d4b823e2ba51cc69" kind="variable"><name>_me</name></member>
+    <member refid="group__public__consts_1gaafc269ed5e4c22e6fa0ed79e744ebd7b" kind="variable"><name>MIN_PERMLINK_LENGTH</name></member>
+    <member refid="group__public__consts_1gacf95aa9d7aa3c83c92526f7e9f43b022" kind="variable"><name>MAX_PERMLINK_LENGTH</name></member>
+  </compound>
+  <compound refid="group__public__actions" kind="group"><name>public_actions</name>
+    <member refid="group__public__actions_1ga6bde994fdc6dec338a07ac007605a500" kind="function"><name>post</name></member>
+    <member refid="group__public__actions_1gac7ad5c8dfbb613aefe5efaa12849403e" kind="function"><name>del</name></member>
+  </compound>
+  <compound refid="group__public__tables" kind="group"><name>public_tables</name>
+  </compound>
+  <compound refid="indexpage" kind="page"><name>index</name>
+  </compound>
+</doxygenindex>

@@ -1,0 +1,233 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.3" xml:lang="en-US">
+  <compounddef id="group__public__actions" kind="group">
+    <compoundname>public_actions</compoundname>
+    <title>ACTIONS</title>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="group__public__actions_1ga6bde994fdc6dec338a07ac007605a500" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void log::post</definition>
+        <argsstring>(eosio::name owner, eosio::name author, std::string permlink, eosio::name parent_author, std::string parent_permlink, std::string title, std::string body, std::string meta, bool comments_is_enabled, int64_t priority, bool is_encrypted, std::string public_key)</argsstring>
+        <name>post</name>
+        <qualifiedname>log::post</qualifiedname>
+        <param>
+          <type>eosio::name</type>
+          <declname>owner</declname>
+        </param>
+        <param>
+          <type>eosio::name</type>
+          <declname>author</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>permlink</declname>
+        </param>
+        <param>
+          <type>eosio::name</type>
+          <declname>parent_author</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>parent_permlink</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>title</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>body</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>meta</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>comments_is_enabled</declname>
+        </param>
+        <param>
+          <type>int64_t</type>
+          <declname>priority</declname>
+        </param>
+        <param>
+          <type>bool</type>
+          <declname>is_encrypted</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>public_key</declname>
+        </param>
+        <briefdescription>
+<para>Метод публикации поста </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>AUTH: author</title><para></para>
+</simplesect>
+Метод публикует пост от автора в пространстве памяти хоста. Каждый пользователь может использовать своё пространство в памяти для хранения постов.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">owner</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Пространство в памяти для хранения поста (хост) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">author</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Автор поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">permlink</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Строковая прямая ссылка </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">parent_author</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Автор родительского поста (не обязательно) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">parent_permlink</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Строковая прямая ссылка родительского поста (не обязательно) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">title</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Заголовок поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">body</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Тело поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">meta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Мета-данные поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">comments_is_enabled</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Индикатор режима комментирования (вкл/вкл) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">priority</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Приоритет поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">is_encrypted</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Указатель шифрованного поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">public_key</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Публичный ключ для дешифровки поста </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="log.hpp" line="11" column="11" bodyfile="log.cpp" bodystart="65" bodyend="131"/>
+      </memberdef>
+      <memberdef kind="function" id="group__public__actions_1gac7ad5c8dfbb613aefe5efaa12849403e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void log::del</definition>
+        <argsstring>(eosio::name owner, eosio::name author, std::string permlink)</argsstring>
+        <name>del</name>
+        <qualifiedname>log::del</qualifiedname>
+        <param>
+          <type>eosio::name</type>
+          <declname>owner</declname>
+        </param>
+        <param>
+          <type>eosio::name</type>
+          <declname>author</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>permlink</declname>
+        </param>
+        <briefdescription>
+<para>Метод удаления поста </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="par"><title>AUTH: author</title><para></para>
+</simplesect>
+Удаляет пост из оперативной памяти <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername direction="in">owner</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Пространство памяти хранения поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">author</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Автор поста </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername direction="in">permlink</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Прямая ссылка на пост </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="log.hpp" line="12" column="11" bodyfile="log.cpp" bodystart="144" bodyend="156"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Методы действий контракта </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

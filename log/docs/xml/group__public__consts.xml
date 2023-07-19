@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.3" xml:lang="en-US">
+  <compounddef id="group__public__consts" kind="group">
+    <compoundname>public_consts</compoundname>
+    <title>CONSTS</title>
+      <sectiondef kind="user-defined">
+      <memberdef kind="variable" id="group__public__consts_1gaf276fa07b1affd33d4b823e2ba51cc69" prot="public" static="yes" constexpr="yes" mutable="no">
+        <type>constexpr eosio::name</type>
+        <definition>constexpr eosio::name log::_me</definition>
+        <argsstring></argsstring>
+        <name>_me</name>
+        <qualifiedname>log::_me</qualifiedname>
+        <initializer>= &quot;log&quot;_n</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>собственное имя аккаунта контракта </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="log.hpp" line="22" column="34" bodyfile="log.hpp" bodystart="22" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="group__public__consts_1gaafc269ed5e4c22e6fa0ed79e744ebd7b" prot="public" static="yes" mutable="no">
+        <type>const uint64_t</type>
+        <definition>const uint64_t log::MIN_PERMLINK_LENGTH</definition>
+        <argsstring></argsstring>
+        <name>MIN_PERMLINK_LENGTH</name>
+        <qualifiedname>log::MIN_PERMLINK_LENGTH</qualifiedname>
+        <initializer>= 3</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>минимальное количество символов в прямой ссылке </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="log.hpp" line="23" column="27" bodyfile="log.hpp" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="group__public__consts_1gacf95aa9d7aa3c83c92526f7e9f43b022" prot="public" static="yes" mutable="no">
+        <type>const uint64_t</type>
+        <definition>const uint64_t log::MAX_PERMLINK_LENGTH</definition>
+        <argsstring></argsstring>
+        <name>MAX_PERMLINK_LENGTH</name>
+        <qualifiedname>log::MAX_PERMLINK_LENGTH</qualifiedname>
+        <initializer>= 256</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>максимальное количество символов в прямой ссылке </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="log.hpp" line="24" column="27" bodyfile="log.hpp" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+<para>Константы контракта </para>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+  </compounddef>
+</doxygen>

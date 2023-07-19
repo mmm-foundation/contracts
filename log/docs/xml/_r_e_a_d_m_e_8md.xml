@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.3" xml:lang="en-US">
+  <compounddef id="_r_e_a_d_m_e_8md" kind="file" language="Markdown">
+    <compoundname>README.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>LOG</highlight></codeline>
+<codeline><highlight class="normal">###<sp/>Стек:<sp/>C/C++,<sp/>eosio.cdt<sp/>1.5.0</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Введение</highlight></codeline>
+<codeline><highlight class="normal">Контракт<sp/>используется<sp/>для<sp/>создания<sp/>постов<sp/>и<sp/>комментариев<sp/>к<sp/>ним<sp/>неограниченной<sp/>вложенности.<sp/>Работает<sp/>в<sp/>связке<sp/>с<sp/>модулем<sp/>DEMUX,<sp/>получающим<sp/>посты<sp/>из<sp/>блокчейна<sp/>и<sp/>модулем<sp/>GRAPHQL<sp/>для<sp/>выдачи<sp/>их<sp/>веб-терминалу<sp/>по<sp/>API.<sp/>На<sp/>текущий<sp/>момент<sp/>хранит<sp/>посты<sp/>в<sp/>оперативной<sp/>памяти,<sp/>что<sp/>не<sp/>является<sp/>обязательным.<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Компиляция</highlight></codeline>
+<codeline><highlight class="normal">Заменить<sp/>ABSOLUTE_PATH_TO_CONTRACT<sp/>на<sp/>абсолютный<sp/>путь<sp/>к<sp/>директории<sp/>контракта<sp/>log.<sp/></highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">docker<sp/>run<sp/>--rm<sp/>--name<sp/>eosio.cdt_v1.5.0<sp/>--volume<sp/>/ABSOLUTE_PATH_TO_CONTRACT:/project<sp/>-w<sp/>/project<sp/>eostudio/eosio.cdt:v1.5.0<sp/>/bin/bash<sp/>-c<sp/>&quot;eosio-cpp<sp/>-abigen<sp/>-I<sp/>include<sp/>-R<sp/>include<sp/>-contract<sp/>log<sp/>-o<sp/>log.wasm<sp/>log.cpp&quot;<sp/>&amp;</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Генерация<sp/>документации</highlight></codeline>
+<codeline><highlight class="normal">Требуется<sp/>Doxygen<sp/>версии<sp/>от<sp/>1.9.3</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">git<sp/>submodule<sp/>update<sp/>--init<sp/>--recursive</highlight></codeline>
+<codeline><highlight class="normal">doxygen</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Установка</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">cleos<sp/>set<sp/>contract<sp/>log<sp/>ABSOLUTE_PATH_TO_CONTRACT<sp/>-p<sp/>log</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Действующие<sp/>аккаунты</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>me<sp/>-<sp/>собственное<sp/>имя<sp/>контракта;</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Основные<sp/>управляющие<sp/>параметры</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>MIN_PERMLINK_LENGTH<sp/>-<sp/>минимальное<sp/>количество<sp/>символов<sp/>в<sp/>прямой<sp/>ссылке</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>MAX_PERMLINK_LENGTH<sp/>-<sp/>максимальное<sp/>количество<sp/>символов<sp/>в<sp/>прямой<sp/>ссылке</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Роли</highlight></codeline>
+<codeline><highlight class="normal">-<sp/>Автор<sp/>-<sp/>создаёт<sp/>и<sp/>удаляет<sp/>пост</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>Сценарии</highlight></codeline>
+<codeline><highlight class="normal">###<sp/>Создать<sp/>пост</highlight></codeline>
+<codeline><highlight class="normal">Для<sp/>создания<sp/>поста,<sp/>необходимо<sp/>вызвать<sp/>метод<sp/>post:</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>post<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink&quot;,<sp/>&quot;&quot;,<sp/>&quot;&quot;,<sp/>&quot;title&quot;,<sp/>&quot;body&quot;,<sp/>&quot;&quot;,<sp/>true,<sp/>0,<sp/>false,<sp/>&quot;&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Для<sp/>создания<sp/>ответа<sp/>на<sp/>этот<sp/>пост,<sp/>необходимо<sp/>вызвать<sp/>метод<sp/>post<sp/>с<sp/>указанием<sp/>параметров<sp/>поста-родителя:</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>post<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink2&quot;,<sp/>&quot;permlink&quot;,<sp/>&quot;tester&quot;,<sp/>&quot;title&quot;,<sp/>&quot;body&quot;,<sp/>&quot;&quot;,<sp/>true,<sp/>0,<sp/>false,<sp/>&quot;&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Удалить<sp/>пост</highlight></codeline>
+<codeline><highlight class="normal">Для<sp/>удаления<sp/>поста<sp/>необходимо<sp/>вызвать<sp/>метод<sp/>del:<sp/></highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline><highlight class="normal">cleos<sp/>push<sp/>action<sp/>log<sp/>del<sp/>&apos;[tester,<sp/>tester,<sp/>&quot;permlink&quot;]&apos;<sp/>-p<sp/>tester</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">###<sp/>Документация<sp/>к<sp/>методам<sp/>и<sp/>таблицам<sp/>контракта</highlight></codeline>
+<codeline><highlight class="normal">Документация<sp/>к<sp/>методам<sp/>и<sp/>таблицам<sp/>контракта<sp/>доступна<sp/>в<sp/>папке<sp/>docs/html/index.html</highlight></codeline>
+<codeline></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>TODO</highlight></codeline>
+    </programlisting>
+    <location file="README.md"/>
+  </compounddef>
+</doxygen>
