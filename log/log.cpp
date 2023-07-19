@@ -63,7 +63,9 @@ using namespace eosio;
    * @param[in]  public_key           Публичный ключ для дешифровки поста
    */
   [[eosio::action]] void log::post(eosio::name owner, eosio::name author, std::string permlink, eosio::name parent_author, std::string parent_permlink, std::string title, std::string body, std::string meta, bool comments_is_enabled, int64_t priority, bool is_encrypted, std::string public_key){
-    require_auth(author);
+    if (!has_auth(owner) ) {
+      require_auth( author );
+    } 
     
     comments_index comments (_me, owner.value);
     validate_permlink(permlink);
@@ -142,17 +144,21 @@ using namespace eosio;
    */
 
   [[eosio::action]] void log::del(eosio::name owner, eosio::name author, std::string permlink){
-  
-    require_auth(author);
+
+    if (!has_auth(owner) ) {
+      require_auth( author );
+    } 
 
     comments_index comments (_me, owner.value);
     auto hash = hash64(permlink);
     auto comment = comments.find(hash);
-    eosio::check(comment != comments.end(), "Comment is not found");
-    eosio::check(comment->permlink == permlink, "Wrong permlink");
-    eosio::check(comment->author == author, "Wrong author");
+    if (comment != comments.end()){ 
+      eosio::check(comment->permlink == permlink, "Wrong permlink");
+      eosio::check(comment->author == author, "Wrong author");
+      
+      comments.erase(comment);  
+    }
     
-    comments.erase(comment);
   }
 
 
