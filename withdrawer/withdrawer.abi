@@ -1,0 +1,171 @@
+{
+    "____comment": "This file was generated with eosio-abigen. DO NOT EDIT ",
+    "version": "eosio::abi/1.1",
+    "types": [],
+    "structs": [
+        {
+            "name": "addadmin",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "admins",
+            "base": "",
+            "fields": [
+                {
+                    "name": "username",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "cancel",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                },
+                {
+                    "name": "withdraw_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "cancel_reason",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "complete",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                },
+                {
+                    "name": "withdraw_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "trx_id",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "rmadmin",
+            "base": "",
+            "fields": [
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "admin",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "withdraws",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "host",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "name"
+                },
+                {
+                    "name": "contract",
+                    "type": "name"
+                },
+                {
+                    "name": "amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "address",
+                    "type": "string"
+                },
+                {
+                    "name": "trx_id",
+                    "type": "string"
+                },
+                {
+                    "name": "cancel_reason",
+                    "type": "string"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "addadmin",
+            "type": "addadmin",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancel",
+            "type": "cancel",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "complete",
+            "type": "complete",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "rmadmin",
+            "type": "rmadmin",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "admins",
+            "type": "admins",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "withdraws",
+            "type": "withdraws",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": []
+}
