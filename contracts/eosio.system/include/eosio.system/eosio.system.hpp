@@ -738,6 +738,10 @@ namespace eosiosystem {
          void checkstatus(  );
 
          [[eosio::action]]
+         void emit( block_timestamp timestamp );
+
+
+         [[eosio::action]]
          void seteparams( int64_t new_tokens_per_block, int64_t to_producers_percent, int64_t to_saving_percent, int64_t per_block_pay_percent, int64_t per_vote_pay_percent, bool spraying_enabled, int64_t new_tokens_for_spraying, int64_t spraying_period_in_blocks, int64_t spraying_rotation_percent, int64_t spraying_core_funds_percent, name core_host );
             
          [[eosio::action]]
@@ -1011,6 +1015,9 @@ namespace eosiosystem {
          using update_action = eosio::action_wrapper<"update"_n, &system_contract::update>;
          using checkstatus_action = eosio::action_wrapper<"checkstatus"_n, &system_contract::checkstatus>;
          
+         using emit_action = eosio::action_wrapper<"emit"_n, &system_contract::emit>;
+         
+
          using seteparams_action = eosio::action_wrapper<"seteparams"_n, &system_contract::seteparams>;
          using setacctram_action = eosio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
          using setacctnet_action = eosio::action_wrapper<"setacctnet"_n, &system_contract::setacctnet>;
@@ -1126,7 +1133,7 @@ namespace eosiosystem {
          double update_total_votepay_share( time_point ct,
                                             double additional_shares_delta = 0.0, double shares_rate_delta = 0.0 );
 
-         void emit(block_timestamp timestamp);
+         // void emit(block_timestamp timestamp);
 
          
          template <auto system_contract::*...Ptrs>

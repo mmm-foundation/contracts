@@ -219,6 +219,20 @@ void token::issueall( name owner, const symbol& symbol, eosio::asset amount )
    });
 }
 
+
+void token::changeissuer( const symbol& symbol, name issuer )
+{
+   
+   auto sym_code_raw = symbol.code().raw();
+   stats statstable( _self, sym_code_raw );
+   const auto& st = statstable.get( sym_code_raw, "symbol does not exist" );
+   require_auth( st.issuer );
+   statstable.modify(st, st.issuer, [&](auto &i){
+    i.issuer = issuer;
+   });
+}
+
+
 } /// namespace eosio
 
-EOSIO_DISPATCH( eosio::token, (create)(issue)(transfer)(open)(close)(retire)(issueall) )
+EOSIO_DISPATCH( eosio::token, (create)(issue)(transfer)(open)(close)(retire)(issueall)(changeissuer) )

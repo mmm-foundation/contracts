@@ -45,6 +45,10 @@ namespace eosio {
 
          [[eosio::action]]
          void issueall(name owner, const symbol& symbol, eosio::asset amount);
+         
+         [[eosio::action]]
+         void changeissuer(const symbol& symbol, name issuer);
+         
 
          static asset get_supply( name token_contract_account, symbol_code sym_code )
          {

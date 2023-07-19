@@ -108,7 +108,7 @@ namespace eosiosystem {
       const asset max_token_supply   = eosio::token::get_max_supply(token_account, core_symbol().code() );
       
       uint64_t new_tokens = _commstate.new_tokens_per_block;
-      
+      print("on emit: ", new_tokens);
       if (new_tokens > 0) {
 
          // if (max_token_supply.amount - token_supply.amount < new_tokens)                  
@@ -248,7 +248,6 @@ namespace eosiosystem {
 
          if (expired_host -> pool_expired_at.sec_since_epoch() < current_time_point().sec_since_epoch()){
          
-            print("on refreshst1");
             action(
                permission_level{ _self, "active"_n },
                core_account, "refreshst"_n,
@@ -257,7 +256,6 @@ namespace eosiosystem {
          
          } else if (wexpired_host -> window_expired_at.sec_since_epoch() < current_time_point().sec_since_epoch()){
          
-            print("on refreshst2");
             action(
                permission_level{ _self, "active"_n },
                core_account, "refreshst"_n,
@@ -271,8 +269,7 @@ namespace eosiosystem {
             auto is_updated_index = updates.template get_index<"isupdated"_n>();
             
             auto host = is_updated_index.find(0);
-            print("on update: ", host -> host);
-
+            
             if (host != is_updated_index.end()){
                if (host -> update_balances_is_finish == false) {
                   cycle_index cycles(core_account, host->host.value);
