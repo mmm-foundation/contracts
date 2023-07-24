@@ -234,7 +234,7 @@ eosio::asset unicore::emit(eosio::name host, eosio::asset host_income, eosio::as
                 action(
                     permission_level{ _me, "active"_n },
                     "eosio"_n, "inprodincome"_n,
-                    std::make_tuple( acc -> root_token_contract, witness_amount) 
+                    std::make_tuple(_me, acc -> root_token_contract, witness_amount) 
                 ).send();
 
 

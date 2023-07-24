@@ -1,3 +1,7 @@
+core/core.wasm
+core/core.abi
+p2p/p2p.wasm
+p2p/p2p.abi
 # Prerequisites
 *.d
 

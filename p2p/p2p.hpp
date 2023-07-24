@@ -24,18 +24,31 @@ public:
     static void add_balance(eosio::name payer, eosio::asset quantity, eosio::name contract);   
     static void sub_balance(eosio::name username, eosio::asset quantity, eosio::name contract);
 
-    static void addbbal(eosio::name host, eosio::name contract, eosio::asset quantity);
+    static void adddistrbal(eosio::name host, eosio::name contract, eosio::asset quantity);
     
     static void make_vesting_action(eosio::name owner, eosio::name contract, eosio::asset amount);
 
-    static void check_bonuse_system(eosio::name creator, eosio::name reciever, eosio::asset quantity);
+    static void check_distribution(eosio::name creator, eosio::name reciever, eosio::asset quantity);
 
     static void check_guest_and_gift_account(eosio::name username, eosio::name contract, eosio::asset amount, uint64_t gift_account_from_amount);
 
-    static uint64_t get_order_id();
+    static uint64_t get_global_id(eosio::name key);
+    static uint64_t count_funds(eosio::name owner);
+
+
+    [[eosio::action]]
+    void addfund(eosio::name owner, std::string title, eosio::name type, uint64_t weight, eosio::name transfer_to, std::string transfer_memo);
+
+    [[eosio::action]] void rmfund(eosio::name owner, uint64_t fund_id);
 
     [[eosio::action]]
     void createorder(name username, uint64_t parent_id, name type, eosio::name root_contract, eosio::asset root_quantity, eosio::name quote_type, double quote_rate, eosio::name quote_contract, eosio::asset quote_quantity, eosio::name out_type, double out_rate, eosio::name out_contract, eosio::asset out_quantity, std::string details);
+
+
+    //ONLY FOR TEST!
+    [[eosio::action]]
+    void distribute(eosio::name owner, eosio::asset amount);
+
 
     [[eosio::action]]
     void accept(name username, uint64_t id, std::string details);
@@ -68,10 +81,7 @@ public:
     void delrate(uint64_t id);
 
     [[eosio::action]]
-    void delvesting(eosio::name owner, uint64_t id);
-
-    [[eosio::action]]
-    void setbrate(eosio::name host, double distribution_rate);
+    void setdistrrate(eosio::name host, double distribution_rate, eosio::name partner_host);
 
     [[eosio::action]] 
     void refreshsh (eosio::name owner, uint64_t id);
@@ -81,10 +91,6 @@ public:
     
     [[eosio::action]] 
     void setparams(bool enable_growth, eosio::name growth_type, double start_rate, uint64_t percents_per_month, bool enable_vesting, uint64_t vesting_seconds, eosio::time_point_sec vesting_pause_until, uint64_t gift_account_from_amount, eosio::name ref_pay_type);
-
-    [[eosio::action]] 
-    void subbbal(eosio::name host, eosio::name contract, eosio::asset quantity);
-
 
     /**
     * @ingroup public_consts 
@@ -99,19 +105,11 @@ public:
     static constexpr eosio::name _CORE_SALE_ACCOUNT = "core"_n;                             /*!< аккаунт системного продавца токенов, в сделке к которым срабатывает вестинг */
     static constexpr eosio::name _REGISTRATOR_ACCOUNT = "registrator"_n;                    /*!< аккаунт контракта регистратора, хранящего таблицу с гостями для подарочного выкупа */
     
+    static constexpr eosio::name _core_host = "alfatest"_n;                                 /*!< имя аккаунта  */    
+        
 
-    static const uint64_t _PERCENTS_PER_MONTH = 42;                                         /*!< если рост курса системного токена подключен, то растёт с указанной здесь скоростью */
-    
     static const uint64_t _HUNDR_PERCENT = 100 * 10000;
 
-    static const bool _ENABLE_GROWHT = false;                                                /*!< флаг подключения автоматического роста курса, допускающего вызов метода uprate от системного контракта eosio */
-
-    static const bool _ENABLE_VESTING = false;                                               /*!< флаг подключения режима вестинга для совершенных покупок у аккаунта _CORE_SALE_ACCOUNT */
-    static const uint64_t _VESTING_SECONDS = 15770000;                                      /*!< продолжительность вестинга в секундах */
-    
-    static const uint64_t _GIFT_ACCOUNT_FROM_AMOUNT = 100000;                               /*!< подарок в виде аккаунта партнера осуществляется, если гость совершает покупку на сумму более, чем указано здесь (с учётом точности) */
-
-    // static const uint64_t _ORDER_EXPIRATION = 10;                                        /*!< время до истечения срока давности ордера */
     static const uint64_t _ORDER_EXPIRATION = 30 * 60;                                      /*!< время до истечения срока давности ордера */
     static constexpr double _START_RATE = 0.2;                                              /*!< начальный курс старта роста системного токена относительно USD */
 
@@ -343,25 +341,54 @@ public:
     /**
      * @brief      Таблица резервов контракта для выплат бонусов в реферальную сеть
      * @ingroup public_tables
-     * @table bbonuses
+     * @table distribution
      * @contract _me
      * @scope _me
      * @details    Таблица пополняется переводом на аккаунт контракта с указаним в поле memo аккаунта продавца, 
      * который будет использовать распределение на сеть покупателя. Распределение срабатывает в момент завершения сделки, увеличивая значение в поле distributed согласно курсу распределения disctribution_rate.
      */
-    struct [[eosio::table]] bbonuses {
+    struct [[eosio::table]] distribution {
         eosio::name host;           /*!< имя хоста продавца, при сделке с которым, срабатывает выплата в сеть */
-        eosio::name contract;       /*!< имя контракта токена */
+        eosio::name token_contract;       /*!< имя контракта токена */
+        uint64_t total_weight;              /*!< общий вес подключенных фондов */
         eosio::asset total;         /*!< сколько токенов всего было на распределении */
         eosio::asset available;     /*!< сколько токенов доступно для распределения */
         eosio::asset distributed;   /*!< сколько токенов уже распределено */
         double distribution_rate;   /*!< курс распределения бонусов, согласно которому, в сеть распределяется столько же монет, сколько получил пользователь, умноженное на этот курс */
-
+        eosio::name partner_host;  /*!< хост, который используется для распределения партнёрского фонда */  
         uint64_t primary_key() const {return host.value;} /*!< return host - primary_key */
     };
 
 
-    typedef eosio::multi_index<"bbonuses"_n, bbonuses> bbonuses_index;
+    typedef eosio::multi_index<"distribution"_n, distribution> distribution_index;
+
+
+
+    /**
+     * @brief      Таблица резервов контракта для выплат бонусов в реферальную сеть
+     * @ingroup public_tables
+     * @table funds
+     * @contract _me
+     * @scope _me
+     * @details    Таблица пополняется переводом на аккаунт контракта с указаним в поле memo аккаунта продавца, 
+     * который будет использовать распределение на сеть покупателя. Распределение срабатывает в момент завершения сделки, увеличивая значение в поле distributed согласно курсу распределения disctribution_rate.
+     */
+    struct [[eosio::table]] funds {
+        uint64_t id;
+        eosio::name owner;           /*!< имя хоста продавца, при сделке с которым, срабатывает выплата в сеть */
+        std::string title;             /*!< строковое название фонда */  
+        eosio::name type;             /*!< transfer | partners  */ 
+        uint64_t weight;               /*!< вес фонда в распределении */ 
+        eosio::name transfer_to;      /*!< на какой контракт совершать перевод */  
+        std::string transfer_memo;    /*!< используется для указания в поле memo при переводе */
+        eosio::asset distributed;   /*!< сколько токенов уже распределено через этот фонд */
+        
+        uint64_t primary_key() const {return id;} /*!< return id - primary_key */
+    };
+
+
+    typedef eosio::multi_index<"funds"_n, funds> funds_index;
+
 
 
 

@@ -209,11 +209,11 @@ extern "C" {
                             auto acc = accounts.find(host.value);
                             sincome_index sincome(_me, host.value);
         
-                            auto sinc = sincome.find(acc -> current_pool_id);
+                            // auto sinc = sincome.find(acc -> current_pool_id);
                             
-                            sincome.modify(sinc, _me, [&](auto &s){
-                                s.paid_to_refs += op.quantity;
-                            });
+                            // sincome.modify(sinc, _me, [&](auto &s){
+                            //     s.paid_to_refs += op.quantity;
+                            // });
 
                             unicore::spread_to_refs(host, username, op.quantity, op.quantity, name(code));
 

@@ -28,16 +28,16 @@ void p2p::check_guest_and_gift_account(eosio::name username, eosio::name contrac
 
       if (guest != guests.end()) {
 
-        bbonuses_index bonuses(_me, _me.value);
-        auto bonuse_bal = bonuses.find(_CORE_SALE_ACCOUNT.value);
+        distribution_index distribution(_me, _me.value);
+        auto distr = distribution.find(_CORE_SALE_ACCOUNT.value);
         
-        if (bonuse_bal -> available >= guest -> to_pay && bonuse_bal -> contract == contract) {
+        if (distr -> available >= guest -> to_pay && distr -> token_contract == contract) {
 
           std::string p2p_memo =  std::string(_me.to_string());
 
           action(
               permission_level{ _me, "active"_n },
-              bonuse_bal->contract, "transfer"_n,
+              distr->token_contract, "transfer"_n,
               std::make_tuple( _me, _REGISTRATOR_ACCOUNT, guest->to_pay, p2p_memo) 
           ).send();
          
@@ -47,7 +47,7 @@ void p2p::check_guest_and_gift_account(eosio::name username, eosio::name contrac
               std::make_tuple( _me, username, guest -> to_pay) 
           ).send();
           
-          bonuses.modify(bonuse_bal, _me, [&](auto &b) {
+          distribution.modify(distr, _me, [&](auto &b) {
             b.available -= guest -> to_pay;
             b.distributed += guest -> to_pay;
           });
@@ -111,18 +111,18 @@ void p2p::add_balance(eosio::name payer, eosio::asset quantity, eosio::name cont
 
 
 //Бонусный баланс пополняется только прямым переводом от хоста
-void p2p::addbbal(eosio::name host, eosio::name contract, eosio::asset quantity){
+void p2p::adddistrbal(eosio::name host, eosio::name contract, eosio::asset quantity){
     require_auth(host);
 
-    bbonuses_index bonuses(_me, _me.value);
+    distribution_index distribution(_me, _me.value);
     
-    auto bonuse_bal = bonuses.find(host.value);
+    auto distr = distribution.find(host.value);
 
-    if (bonuse_bal  == bonuses.end()) {
+    if (distr  == distribution.end()) {
 
-      bonuses.emplace(_me, [&](auto &b) {
+      distribution.emplace(_me, [&](auto &b) {
         b.host = host;
-        b.contract = contract;
+        b.token_contract = contract;
         b.total = quantity;
         b.available = quantity;
         b.distributed = asset(0, quantity.symbol);
@@ -130,9 +130,9 @@ void p2p::addbbal(eosio::name host, eosio::name contract, eosio::asset quantity)
       }); 
 
     } else {
-      eosio::check(bonuse_bal -> contract == contract, "Wrong contract for add to bonuse balance");
+      eosio::check(distr -> token_contract == contract, "Wrong contract for add to bonuse balance");
 
-      bonuses.modify(bonuse_bal, _me, [&](auto &b){
+      distribution.modify(distr, _me, [&](auto &b){
         b.total += quantity;
         b.available += quantity;
       });
@@ -141,126 +141,212 @@ void p2p::addbbal(eosio::name host, eosio::name contract, eosio::asset quantity)
 }
 
 
-//Бонусный баланс уменьшается путём перевода на аккаунт ядра на распределение в момент покупки здесь
-void p2p::subbbal(eosio::name host, eosio::name contract, eosio::asset quantity){
-    require_auth(host);
-
-    bbonuses_index bonuses(_me, _me.value);
-    
-    auto bonuse_bal = bonuses.find(host.value);
-
-    if (bonuse_bal  == bonuses.end()) {
-
-      eosio::check(false, "Cannot spread bonuse balance without balance");
-
-    } else {
-      // eosio::check(bonuse_bal -> contract == contract, "Wrong contract for bonuse balance");
-
-      bonuses.erase(bonuse_bal);
-      // bonuses.modify(bonuse_bal, _me, [&](auto &b) {
-      //   b.available -= quantity;
-      //   b.distributed += quantity;
-      // });
-
-    };
-}
-
-
 /**
- * @brief      Метод установки бонусного курса
+ * @brief      Метод установки распределения
  * @details    Вызывается владельцем бонусного баланса в контракте для подключения распределения на партнёрскую сеть покупателя.
  * @ingroup public_actions
  * @auth       host
  * @param[in]  host               The host
  * @param[in]  distribution_rate  The distribution rate
  */
-void p2p::setbrate(eosio::name host, double distribution_rate) {
+
+void p2p::setdistrrate(eosio::name host, double distribution_rate, eosio::name partner_host) {
 
     require_auth(host);
 
-    bbonuses_index bonuses(_me, _me.value);
+    distribution_index distribution(_me, _me.value);
     
-    auto bonuse_bal = bonuses.find(host.value);
+    auto distr = distribution.find(host.value);
 
-    eosio::check(bonuse_bal != bonuses.end(), "Bonus balance is not exist");
+    eosio::check(distr != distribution.end(), "Distribution object is not exist");
     
-    bonuses.modify(bonuse_bal, _me, [&](auto &b) {
+    distribution.modify(distr, _me, [&](auto &b) {
       b.distribution_rate = distribution_rate;
+      b.partner_host = partner_host;
     });
 
 }
 
-//Установка курсу конвертации в бонусы
-void p2p::check_bonuse_system(eosio::name creator, eosio::name reciever, eosio::asset quantity) {
 
-    bbonuses_index bonuses(_me, _me.value);
+
+
+//TODO del
+void p2p::distribute(eosio::name host, eosio::asset amount) {
+
+    require_auth(host);
+
+    distribution_index distribution(_me, _me.value);
     
-    auto bonuse_bal = bonuses.find(creator.value);
+    check_distribution(host, host, amount);
 
-    if (bonuse_bal != bonuses.end()) {
-     
-      eosio::asset to_distribution = asset(quantity.amount * bonuse_bal -> distribution_rate, quantity.symbol);
-      
-      account_index accounts(_core, creator.value);
-      auto acc = accounts.find(creator.value);
-      uint64_t to_ref_percent = _HUNDR_PERCENT;
-      uint64_t to_dac_percent = 0;
-      eosio::asset to_ref_amount = to_distribution;
-      eosio::asset to_dac_amount = asset(0, quantity.symbol); 
+    
+}
 
 
-      if (acc != accounts.end()) {
-         to_ref_percent = acc -> referral_percent;
-         to_dac_percent = _HUNDR_PERCENT - to_ref_percent;
-         to_ref_amount = to_distribution * to_ref_percent / _HUNDR_PERCENT;
-         to_dac_amount = to_distribution * to_dac_percent / _HUNDR_PERCENT;
-      }
 
-      if (to_ref_amount <= bonuse_bal -> available && to_ref_amount.amount > 0) {
-        
-        std::string st1 = "111";
-        std::string st2 = std::string(creator.to_string());
-        std::string st3 = "-";
-        std::string st4 = std::string(reciever.to_string());
+/**
+ * @brief      Метод создания фонда распределения
+ * @details    Вызывается владельцем бонусного баланса в контракте для подключения распределения
+ * @ingroup public_actions
+ * @auth       owner
+ * @param[in]  owner               The owner
+ * @param[in]  distribution_rate  The distribution rate
+ */
+void p2p::addfund(eosio::name owner, std::string title, eosio::name type, uint64_t weight, eosio::name transfer_to, std::string transfer_memo) {
 
-        std::string st = std::string(st1 + st3 + st2 + st3 + st4);
-        
-        action(
-            permission_level{ _me, "active"_n },
-            bonuse_bal->contract, "transfer"_n,
-            std::make_tuple( _me, _core, to_ref_amount, st) 
-        ).send();
+    require_auth(owner);
 
-        
-      }
+    distribution_index distribution(_me, _me.value);
+    funds_index funds(_me, owner.value);
 
-      if (to_dac_amount <= bonuse_bal -> available && to_dac_amount.amount > 0) {
-        
-        std::string st1 = "222";
-        std::string st2 = std::string(creator.to_string());
-        std::string st3 = "-";
-        std::string st4 = std::string(reciever.to_string());
+    auto distr = distribution.find(owner.value);
 
-        std::string st = std::string(st1 + st3 + st2);
-        
-        action(
-            permission_level{ _me, "active"_n },
-            bonuse_bal->contract, "transfer"_n,
-            std::make_tuple( _me, _core, to_dac_amount, st) 
-        ).send();
+    eosio::check(distr != distribution.end(), "Distribution object is not exist");
+    
+    eosio::check(type == "transfer"_n || type == "partners"_n, "Type is not supported");
+    
+    if (type == "transfer"_n) {
+      eosio::check(transfer_to != ""_n, "transfer_to should be setted");  
+    } 
+    
+    uint64_t count = p2p::count_funds(owner);
 
-        
-      }
-            
-      if (to_ref_amount.amount > 0 || to_dac_amount.amount > 0)
-        bonuses.modify(bonuse_bal, _me, [&](auto &b) {
-            b.available -= (to_ref_amount + to_dac_amount);
-            b.distributed += to_ref_amount + to_dac_amount;
-        });  
+    eosio::check(count <= 10, "Limit funds is excited.");
+    
+    funds.emplace(owner, [&](auto &f){
+      f.id = get_global_id("funds"_n);
+      f.owner = owner;
+      f.title = title;
+      f.type = type;
+      f.weight = weight;
+      f.transfer_to = transfer_to;
+      f.transfer_memo = transfer_memo;
+    });
+
+    distribution.modify(distr, owner, [&](auto &d){
+      d.total_weight += weight;
+    });
+
+}
 
 
+
+[[eosio::action]] void p2p::rmfund(eosio::name owner, uint64_t fund_id) {
+    require_auth(owner);
+    
+    distribution_index distribution(_me, _me.value);
+    funds_index funds(_me, owner.value);
+
+    auto distr = distribution.find(owner.value);
+
+    eosio::check(distr != distribution.end(), "Distribution object is not found");
+
+    auto fund = funds.find(fund_id);
+    eosio::check(fund != funds.end(), "Fund is not found");
+
+    distribution.modify(distr, owner, [&](auto &d){
+      d.total_weight -= fund -> weight;
+    });
+    
+    funds.erase(fund);
+    
+};
+
+
+// [[eosio::action]] void p2p::editfund(std::string title, eosio::name type, uint64_t weight, eosio::name transfer_to, std::string transfer_memo, uint64_t vesting_seconds, uint64_t cliff_seconds) {
+//     require_auth(owner);
+    
+//     distribution_index distribution(_me, _me.value);
+//     funds_index funds(_me, owner.value);
+
+//     auto distr = distribution.find(owner.value);
+
+//     eosio::check(distr != distribution.end(), "Distribution object is not found");
+
+//     auto fund = funds.find(fund_id);
+//     eosio::check(fund != funds.end(), "Fund is not found");
+
+//     distribution.modify(distr, owner, [&](auto &d){
+//       d.total_weight -= fund -> weight;
+//     });
+    
+//     funds.erase(fund);
+    
+// };
+
+
+
+uint64_t p2p::count_funds(eosio::name owner) {
+    funds_index funds(_me, owner.value);
+
+    uint64_t count = 0;
+    
+    for(auto itr = funds.begin(); itr != funds.end(); ++itr) {
+        ++count;    
     }
-    
+
+    return count;
+}
+
+
+
+//Установка курсу конвертации в бонусы
+void p2p::check_distribution(eosio::name creator, eosio::name reciever, eosio::asset quantity) {
+
+    distribution_index distribution(_me, _me.value);
+    auto distr = distribution.find(creator.value);
+
+    funds_index funds(_me, creator.value);
+    eosio::asset total_distributed = asset(0, quantity.symbol);
+
+    for (auto fund = funds.begin(); fund != funds.end(); ++fund) {
+      
+      eosio::asset to_distribution = asset(quantity.amount * distr -> distribution_rate * fund -> weight / distr -> total_weight, quantity.symbol);
+      
+      if (to_distribution.amount > 0){
+
+       if (fund -> type == "transfer"_n) {
+          
+          action(
+              permission_level{ _me, "active"_n },
+              distr->token_contract, "transfer"_n,
+              std::make_tuple( _me, fund->transfer_to, to_distribution, fund -> transfer_memo) 
+          ).send();
+        
+        } else if (fund -> type == "partners"_n) {
+
+            std::string st1 = "111";
+            std::string st2 = std::string(distr -> partner_host.to_string());
+            std::string st3 = "-";
+            std::string st4 = std::string(reciever.to_string());
+
+            std::string st = std::string(st1 + st3 + st2 + st3 + st4);
+            
+            action(
+                permission_level{ _me, "active"_n },
+                distr->token_contract, "transfer"_n,
+                std::make_tuple( _me, _core, to_distribution, st) 
+            ).send();
+          
+            
+        }
+
+        funds.modify(fund, _me, [&](auto& row) {
+            row.distributed = asset(fund -> distributed.amount + to_distribution.amount, to_distribution.symbol);
+        });
+
+        total_distributed += to_distribution;
+      
+      }
+    }
+
+
+    if (total_distributed.amount > 0)
+      distribution.modify(distr, _me, [&](auto &b) {
+          b.available -= total_distributed;
+          b.distributed += total_distributed;
+      });  
+      
     
 }
 
@@ -295,27 +381,29 @@ void p2p::sub_balance(eosio::name username, eosio::asset quantity, eosio::name c
     
 }
 
-uint64_t p2p::get_order_id(){
-  counts_index counts(_me, _me.value);
-  auto count = counts.find("totalorders"_n.value);
-  uint64_t id = 1;
 
-  if (count == counts.end()){
-    counts.emplace(_me, [&](auto &c){
-      c.key = "totalorders"_n;
-      c.value = id;
-    });
-  } else {
 
-    id = count -> value + 1;
 
-    counts.modify(count, _me, [&](auto &c){
-      c.value = id;
-    });
+uint64_t p2p::get_global_id(eosio::name key) {
 
-  }
+    counts_index counts(_me, _me.value);
+    auto count = counts.find(key.value);
+    uint64_t id = 1;
 
-  return id;
+    if (count == counts.end()) {
+      counts.emplace(_me, [&](auto &c){
+        c.key = key;
+        c.value = id;
+      });
+    } else {
+      id = count -> value + 1;
+      counts.modify(count, _me, [&](auto &c){
+        c.value = id;
+      });
+    }
+
+    return id;
+
 }
 
 
@@ -417,7 +505,7 @@ void p2p::createorder(name username, uint64_t parent_id, name type, eosio::name 
     };
 
 
-    uint64_t id = p2p::get_order_id();
+    uint64_t id = p2p::get_global_id("totalorders"_n);
 
     if (id == 0) {id = 1;};
 
@@ -654,7 +742,7 @@ void p2p::approve(name username, uint64_t id)
 
       eosio::check(parent_order -> creator == username, "Waiting approve from creator of parent order");
 
-      if ( pm->enable_vesting == false) {
+      if ( pm-> enable_vesting == false) {
 
         action(
             permission_level{ _me, "active"_n },
@@ -685,7 +773,7 @@ void p2p::approve(name username, uint64_t id)
   
       //parent creator should pay gifts if has possibility
       //child order creator recieve referral gifts
-      check_bonuse_system(order->parent_creator, order->creator, order->root_quantity);
+      check_distribution(order->parent_creator, order->creator, order->root_quantity);
     
     } else if (order -> type == "sell"_n) {
       eosio::check(order -> creator == username, "Waiting approve from creator of child order");
@@ -718,7 +806,7 @@ void p2p::approve(name username, uint64_t id)
 
       }
       
-      check_bonuse_system(order->creator, parent_order->creator, order->root_quantity);
+      check_distribution(order->creator, parent_order->creator, order->root_quantity);
       
 
     } else {
@@ -945,25 +1033,6 @@ void p2p::delrate(uint64_t id){
 }
 
 
-/**
- * @brief      Метод удаление вестинг-баланса
- * @ingroup public_actions
- 
- * @details Используется администратором для удаления ошибочного начисления вестинг-баланса
- * @auth p2p
- * @param[in]  owner    имя аккаунта владельца вестинг-баланса
- * @param[in]  id       идентификатор вестинг-баланса
- */
-void p2p::delvesting(eosio::name owner, uint64_t id){
-  
-  require_auth( "p2p"_n );
-  vesting_index vests(_me, owner.value);
-  auto v = vests.find(id);
-  eosio::check(v != vests.end(), "Vesting object does not exist");
-  
-  vests.erase(v); 
-}
-
 
 /**
  * @brief      Метод увеличения курса обмена системного токена
@@ -1048,9 +1117,8 @@ void p2p::uprate(eosio::name out_contract, eosio::asset out_asset){
    */
 void p2p::setrate(eosio::name out_contract, eosio::asset out_asset, double rate)
 {
+    //авторизация проверяется на входе
     
-    // eosio::check(out_contract == ""_n, "Out contract is not supported now");  
-
     usdrates_index usd_rates(_me, _me.value);
 
     auto rates_by_contract_and_symbol = usd_rates.template get_index<"byconsym"_n>();
@@ -1102,8 +1170,6 @@ void p2p::setrate(eosio::name out_contract, eosio::asset out_asset, double rate)
     
     uint64_t now_secs = eosio::current_time_point().sec_since_epoch() ;
     uint64_t full_freeze_until_secs = pm->vesting_pause_until.sec_since_epoch() ;
-    print("now_secs > v->startat.sec_since_epoch() ", now_secs > v->startat.sec_since_epoch());
-    print("now_secs > full_freeze_until_secs ", now_secs > full_freeze_until_secs);
     
     if (now_secs > v->startat.sec_since_epoch() && now_secs > full_freeze_until_secs){
       
@@ -1133,7 +1199,6 @@ void p2p::setrate(eosio::name out_contract, eosio::asset out_asset, double rate)
     
     if (pm == params.end()) {
 
-      
       params.emplace(_me, [&](auto &p) {
         p.id = 0;
         p.enable_growth = enable_growth;
@@ -1255,21 +1320,24 @@ extern "C" {
             execute_action(name(receiver), name(code), &p2p::uprate);
           } else if (action == "delrate"_n.value){
             execute_action(name(receiver), name(code), &p2p::delrate);
-          } else if (action == "setbrate"_n.value){
-            execute_action(name(receiver), name(code), &p2p::setbrate);
+          } else if (action == "setdistrrate"_n.value){
+            execute_action(name(receiver), name(code), &p2p::setdistrrate);
           } else if (action == "withdrawsh"_n.value){
             execute_action(name(receiver), name(code), &p2p::withdrawsh);
           } else if (action == "refreshsh"_n.value){
             execute_action(name(receiver), name(code), &p2p::refreshsh);
-          } else if (action == "delvesting"_n.value){
-            execute_action(name(receiver), name(code), &p2p::delvesting);
           } else if (action == "setparams"_n.value){
             execute_action(name(receiver), name(code), &p2p::setparams);
           } else if (action == "fixrate"_n.value){
             execute_action(name(receiver), name(code), &p2p::fixrate);
-          } else if (action == "subbbal"_n.value){
-            execute_action(name(receiver), name(code), &p2p::subbbal);
+          } else if (action == "addfund"_n.value){
+            execute_action(name(receiver), name(code), &p2p::addfund);
+          } else if (action == "rmfund"_n.value){
+            execute_action(name(receiver), name(code), &p2p::rmfund);
+          } else if (action == "distribute"_n.value){
+            execute_action(name(receiver), name(code), &p2p::distribute);
           } 
+
 
           
 
@@ -1296,7 +1364,7 @@ extern "C" {
                 p2p::add_balance(op.from, op.quantity, eosio::name(code));  
 
               } else {
-                p2p::addbbal(host, eosio::name(code), op.quantity);
+                p2p::adddistrbal(host, eosio::name(code), op.quantity);
               }
               
             }
